@@ -1,0 +1,225 @@
+<div class="bg-white shadow rounded-lg border border-slate-200 w-full">
+  @if (svc.viewMode() === 'summary') {
+  <div class="table-scroll-wrap custom-scrollbar w-full">
+    <table class="divide-y divide-slate-200">
+      <thead class="bg-[rgba(0,0,0,1)] text-white">
+        <tr>
+          <th (click)="onSort('advisor')"
+            class="px-6 py-1 text-left text-xs font-bold uppercase tracking-wider w-1/4 cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+            Advisor <span class="sort-icon-text">{{ sortIcon('advisor') }}</span>
+          </th>
+          <th (click)="onSort('provider')"
+            class="px-6 py-1 text-left text-xs font-bold uppercase tracking-wider w-1/4 cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+            Data Provider <span class="sort-icon-text">{{ sortIcon('provider') }}</span>
+          </th>
+          <th (click)="onSort('aua')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+            <div class="flex flex-col items-end">
+              <span>AUA <span class="sort-icon-text">{{ sortIcon('aua') }}</span></span>
+            </div>
+          </th>
+          @if (svc.platformDisplay().addepar) {
+          <th (click)="onSort('addepar')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+            <div class="flex flex-col items-end">
+              <span>Addepar <span class="sort-icon-text">{{ sortIcon('addepar') }}</span></span>
+            </div>
+          </th>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <th (click)="onSort('blackdiamond')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+            <div class="flex flex-col items-end">
+              <span>Black Diamond <span class="sort-icon-text">{{ sortIcon('blackdiamond') }}</span></span>
+            </div>
+          </th>
+          }
+          <th (click)="onSort('total')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider bg-[rgba(0,0,0,1)] cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+            <div class="flex flex-col items-end">
+              <span class="text-[rgba(197,160,89,1)] text-[10px]">Total</span>
+              <span>Grand Total <span class="sort-icon-text">{{ sortIcon('total') }}</span></span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-slate-200">
+
+        @if (svc.advisorGroups().length === 0) {
+        <tr>
+          <td colspan="5" class="px-6 py-12 text-center text-sm text-slate-400 italic">
+            No results match your filters.
+          </td>
+        </tr>
+        }
+
+        @for (group of (shouldShowVirtualScroll ? visibleGroups : svc.advisorGroups()); track group.advisor; trackByAdvisor) {
+        <!-- Collapsed header -->
+        @if (group.collapsed) {
+        <tr class="bg-slate-50">
+          <td
+            class="px-6 py-1 text-sm font-bold text-[#003366] flex items-center gap-2 cursor-pointer hover:bg-slate-100"
+            (click)="onToggle(group.advisor)">
+            <span class="material-icons text-[#C5A059] text-lg">chevron_right</span>{{ group.advisor }}
+          </td>
+          <td class="px-6 py-1 text-sm text-slate-400 italic">{{ group.rows.length }} provider{{ group.rows.length > 1 ?
+            's' : '' }} (collapsed)</td>
+          <td class="px-6 py-1 text-sm text-right text-black">{{ svc.fmt(group.totalAua) }}</td>
+          @if (svc.platformDisplay().addepar) {
+          <td class="px-6 py-1 text-sm text-right text-black">{{ svc.fmt(group.totalAddepar) }}</td>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <td class="px-6 py-1 text-sm text-right text-black">{{ svc.fmt(group.totalBD) }}</td>
+          }
+          <td class="px-6 py-1 text-sm font-medium text-black text-right bg-slate-50">{{
+            svc.fmt(group.grandTotal) }}</td>
+        </tr>
+        } @else {
+        <!-- Expanded header -->
+        <tr class="bg-slate-50">
+          <td
+            class="px-6 py-1 text-sm font-bold text-[#003366] flex items-center gap-2 cursor-pointer hover:bg-slate-100"
+            (click)="onToggle(group.advisor)">
+            <span class="material-icons text-[#C5A059] text-lg">expand_more</span>{{ group.advisor }}
+          </td>
+          <td colspan="5"></td>
+        </tr>
+        <!-- Detail rows -->
+        @for (row of group.rows; track row.provider; trackByProvider) {
+        <tr class="group">
+          <td class="px-6 py-1 text-sm text-slate-500 pl-12 border-r border-slate-100 bg-white"></td>
+          <td class="px-6 py-1 text-sm text-slate-600 font-medium">
+            <!-- Clickable provider chip -->
+            <button type="button" (click)="svc.navigateToProvider(group.advisor, row.provider)"
+              class="bg-transparent text-slate-600 font-medium hover:underline cursor-pointer focus:outline-none"
+              title="View all accounts for {{ row.provider }} under {{ group.advisor }}">
+              {{ row.provider }}
+            </button>
+          </td>
+          <td class="px-6 py-1 text-sm text-black text-right">{{ svc.fmt(row.aua) }}</td>
+          @if (svc.platformDisplay().addepar) {
+          <td class="px-6 py-1 text-sm text-black text-right">{{ svc.fmt(row.addepar) }}</td>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <td class="px-6 py-1 text-sm text-black text-right">{{ svc.fmt(row.blackdiamond) }}</td>
+          }
+          <td class="px-6 py-1 text-sm font-medium text-black text-right bg-slate-50">{{ svc.fmt(row.total
+            ?? 0) }}</td>
+        </tr>
+        }
+        <!-- Subtotal (2+ providers) -->
+        @if (group.rows.length > 1) {
+        <tr class="bg-slate-100 border-t border-slate-300">
+          <td class="px-6 py-3 text-sm font-bold text-[#003366] pl-8 font-serif">{{ group.advisor }} Total</td>
+          <td></td>
+          <td class="px-6 py-1 text-sm font-bold text-black text-right">{{ svc.fmt(group.totalAua) }}</td>
+          @if (svc.platformDisplay().addepar) {
+          <td class="px-6 py-1 text-sm font-bold text-black text-right">{{ svc.fmt(group.totalAddepar) }}
+          </td>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <td class="px-6 py-1 text-sm font-bold text-black text-right">{{ svc.fmt(group.totalBD) }}</td>
+          }
+          <td class="px-6 py-1 text-sm font-bold text-black text-right bg-slate-200">{{
+            svc.fmt(group.grandTotal) }}</td>
+        </tr>
+        }
+        }
+        }
+
+        @if (shouldShowVirtualScroll && svc.advisorGroups().length > VIRTUAL_SCROLL_THRESHOLD) {
+        <tr class="bg-blue-50 border-t-2 border-blue-200">
+          <td colspan="6" class="px-6 py-4 text-center text-sm text-blue-600 font-medium">
+            Showing {{ visibleGroups.length }} of {{ svc.advisorGroups().length }} advisors. Load more...
+          </td>
+        </tr>
+        }
+        @if (svc.advisorGroups().length > 0) {
+        <tr class="bg-white border-t-4 border-[#003366]">
+          <td class="px-6 py-1 text-lg font-bold text-[#003366] font-serif">Grand Total</td>
+          <td class="px-6 py-1"></td>
+          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandAua) }}
+          </td>
+          @if (svc.platformDisplay().addepar) {
+          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandAddepar)
+            }}</td>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandBD) }}
+          </td>
+          }
+          <td class="px-6 py-1 text-lg font-bold text-black text-right bg-slate-100 border-l border-slate-200">{{
+            svc.fmt(svc.kpi().grandTotal) }}</td>
+        </tr>
+        }
+
+      </tbody>
+    </table>
+  </div>
+  <div class="bg-white px-6 py-3 border-t border-slate-200">
+    <p class="text-sm text-slate-700">{{ rowsInfo }}</p>
+  </div>
+  } @else {
+  <!-- Professional detailed table view -->
+
+  <!-- Active provider filter banner -->
+  @if (svc.dataProviderFilter()) {
+  <div class="flex items-center gap-3 px-5 py-2.5 bg-blue-50 border-b border-blue-200">
+    <span class="material-icons text-[#003366] text-base">filter_alt</span>
+    <span class="text-sm text-[#003366] font-medium">Filtered by:</span>
+    <span class="inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-[#003366] text-white text-xs font-semibold">
+      {{ svc.dataProviderFilter()!.advisor }} &mdash; {{ svc.dataProviderFilter()!.provider }}
+    </span>
+    <button type="button" (click)="svc.clearProviderFilter()"
+      class="ml-auto inline-flex items-center gap-1 text-xs text-slate-500 hover:text-red-600 transition-colors"
+      title="Clear filter">
+      <span class="material-icons text-sm">close</span>
+      Clear filter
+    </button>
+  </div>
+  }
+
+  <div class="table-scroll-wrap custom-scrollbar w-full">
+    <table class="divide-y divide-slate-200">
+      <thead class="bg-[rgba(0,0,0,1)] text-white">
+        <tr>
+          @for (col of svc.dataColumns(); track col) {
+            @if (svc.isColumnVisible(col)) {
+              <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">{{ col }}</th>
+            }
+          }
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-slate-200">
+        @if (svc.detailedRows().length === 0) {
+        <tr>
+          <td [attr.colspan]="svc.visibleDataColumns().size" class="px-6 py-12 text-center text-sm text-slate-400 italic">No detailed rows available.</td>
+        </tr>
+        }
+
+        @for (row of svc.detailedRows(); track row["Account Number"]) {
+        <tr>
+          @for (col of svc.dataColumns(); track col) {
+            @if (svc.isColumnVisible(col)) {
+              <td class="px-4 py-1 text-sm text-slate-700" [class.font-mono]="col === 'Account Number'" [class.text-right]="col === 'Market Value'">
+                {{ row[col] }}
+              </td>
+            }
+          }
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <div class="bg-white px-6 py-3 border-t border-slate-200">
+    <p class="text-sm text-slate-700">
+      @if (svc.dataProviderFilter()) {
+      Filtered by <strong>{{ svc.dataProviderFilter()!.advisor }}</strong> &mdash; <strong>{{
+        svc.dataProviderFilter()!.provider }}</strong> &middot; {{ svc.detailedRows().length }} rows
+      } @else {
+      Showing detailed table &middot; {{ svc.detailedRows().length }} rows
+      }
+    </p>
+  </div>
+  }
+</div>

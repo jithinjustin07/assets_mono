@@ -1,0 +1,81 @@
+<!-- @if (svc.kpi(); as kpi) {
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+
+
+  <div class="bg-white rounded-lg shadow-sm border-t-4 border-[#003366] p-5">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total AUM</p>
+        <p class="mt-1 text-3xl font-bold text-black">{{ svc.fmtShort(kpi.grandTotal) }}</p>
+      </div>
+      <div class="p-2 bg-blue-50 rounded-lg">
+        <span class="material-icons text-[#003366] text-2xl">account_balance</span>
+      </div>
+    </div>
+    <div class="mt-4 flex items-center text-sm">
+      @if (svc.dashboardData(); as data) {
+      <span class="text-green-600 font-medium flex items-center">
+        <span class="material-icons text-sm mr-1">trending_up</span>{{ data.kpiMeta.totalAumTrend }}
+      </span>
+      <span class="text-slate-400 ml-2">vs last period</span>
+      }
+    </div>
+  </div>
+
+
+  <div class="bg-white rounded-lg shadow-sm border-t-4 border-[#C5A059] p-5">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Addepar Total</p>
+        <p class="mt-1 text-3xl font-bold text-black">{{ svc.fmtShort(kpi.grandAddepar) }}</p>
+      </div>
+      <div class="p-2 bg-amber-50 rounded-lg">
+        <span class="material-icons text-[#C5A059] text-2xl">pie_chart</span>
+      </div>
+    </div>
+    <div class="mt-4 flex items-center text-sm">
+      <span class="text-slate-600 font-medium">{{ pct(kpi.grandAddepar, kpi.grandTotal) }}</span>
+      <span class="text-slate-400 ml-2">of Total Portfolio</span>
+    </div>
+  </div>
+
+
+  <div class="bg-white rounded-lg shadow-sm border-t-4 border-slate-600 p-5">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Black Diamond</p>
+        <p class="mt-1 text-3xl font-bold text-black">{{ svc.fmtShort(kpi.grandBD) }}</p>
+      </div>
+      <div class="p-2 bg-slate-100 rounded-lg">
+        <span class="material-icons text-slate-600 text-2xl">diamond</span>
+      </div>
+    </div>
+    <div class="mt-4 flex items-center text-sm">
+      <span class="text-slate-600 font-medium">{{ pct(kpi.grandBD, kpi.grandTotal) }}</span>
+      <span class="text-slate-400 ml-2">of Total Portfolio</span>
+    </div>
+  </div>
+
+
+  <div class="bg-white rounded-lg shadow-sm border-t-4 border-[#003366] p-5">
+    <div class="flex justify-between items-start">
+      <div>
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Active Advisors</p>
+        <p class="mt-1 text-3xl font-bold text-black">{{ kpi.advisorCount }}</p>
+      </div>
+      <div class="p-2 bg-blue-50 rounded-lg">
+        <span class="material-icons text-[#003366] text-2xl">groups</span>
+      </div>
+    </div>
+    <div class="mt-4 flex items-center text-sm">
+      @if (svc.dashboardData(); as data) {
+      <span class="text-green-600 font-medium flex items-center">
+        <span class="material-icons text-sm mr-1">add</span>{{ data.kpiMeta.newAccounts }}
+      </span>
+      <span class="text-slate-400 ml-2">New Accounts</span>
+      }
+    </div>
+  </div>
+
+</div>
+} -->

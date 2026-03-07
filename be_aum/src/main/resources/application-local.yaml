@@ -1,0 +1,6 @@
+## Postgres DB connection properties
+spring:
+ datasource:
+  url: jdbc:postgresql://localhost:5432/aum
+  username: postgres
+  password: root

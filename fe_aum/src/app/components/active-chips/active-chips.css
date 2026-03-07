@@ -1,0 +1,13 @@
+/* Reserve vertical space for active filter chips so layout doesn't jump */
+:host {
+  display: block;
+  margin-bottom: 16px; /* add space between search and table */
+}
+
+.active-chips-slot {
+  min-height: 32px; /* enough for one row of chips */
+  margin-bottom: 20px; /* same visual spacing as previous mb-5 */
+  display: flex;
+  align-items: flex-start;
+}
+

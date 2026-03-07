@@ -1,0 +1,75 @@
+<div class="filter-wrapper open" aria-hidden="false">
+  <div class="filter-panel" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="filter-header">
+      <div class="flex items-center gap-2">
+        <span class="material-icons" style="font-size: 18px; opacity: 0.9;">tune</span>
+        <h3 class="text-xs font-bold uppercase tracking-wider">Filters</h3>
+        @if (svc.activeFilterCount() > 0) {
+        <span class="filter-badge">{{ svc.activeFilterCount() }}</span>
+        }
+      </div>
+    </div>
+
+    <!-- Body: single column list of filters -->
+    <div class="filter-body custom-scrollbar">
+      @for (f of svc.activeFilterConfig(); track f.key) {
+      <div class="filter-group" [attr.data-key]="f.key">
+
+        <div class="filter-label-row">
+          <div class="fsec-label">
+            <span class="material-icons" style="font-size:14px;color:#003366">{{ f.icon || 'filter_list' }}</span>
+            {{ f.label }}
+          </div>
+          @if (f.matchable) {
+          <span class="clear-link" (click)="clearField(f)">Clear</span>
+          }
+        </div>
+
+        <!-- Multiselect -->
+        @if (f.type === 'multiselect') {
+        <div class="ms-list">
+          @for (opt of f.options; track opt) {
+          <label class="ms-item" [class.selected]="getSet(f.key).has(opt)">
+            <input type="checkbox" [checked]="getSet(f.key).has(opt)"
+              (change)="toggleOption(f.key, opt, $any($event.target).checked)" />
+            {{ opt }}
+          </label>
+          }
+        </div>
+        }
+
+        <!-- Date -->
+        @if (f.type === 'date') {
+        <input type="date" [value]="getString(f.key)" (change)="onDateChange(f.key, $event)" class="input-field" />
+        }
+
+        <!-- Range -->
+        @if (f.type === 'range') {
+        <div class="range-row">
+          <input type="number" placeholder="Min ($)" [value]="getRange(f.key).min"
+            (input)="onRangeChange(f.key, 'min', $event)" class="input-field" />
+          <span class="range-sep">–</span>
+          <input type="number" placeholder="Max ($)" [value]="getRange(f.key).max"
+            (input)="onRangeChange(f.key, 'max', $event)" class="input-field" />
+        </div>
+        }
+
+        <!-- Text -->
+        @if (f.type === 'text') {
+        <input type="text" [placeholder]="'Filter by ' + f.label.toLowerCase() + '…'" [value]="getString(f.key)"
+          (input)="onStringChange(f.key, $event)" class="input-field" />
+        }
+
+      </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="filter-footer">
+      <button (click)="svc.resetFilters()" class="reset-link">Reset current filters</button>
+    </div>
+
+  </div>
+</div>

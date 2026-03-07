@@ -1,0 +1,47 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Enable horizontal scrolling for tables in the data tab. */
+.table-scroll-wrap {
+  display: block;
+  /* ensures overflow works predictably */
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* avoid double scrollbars */
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+  scrollbar-width: thin;
+}
+
+/* Let the table expand horizontally; this forces a horizontal scrollbar when needed. */
+.table-scroll-wrap table {
+  width: max-content;
+  /* size to content so columns don't compress */
+  min-width: 100%;
+  /* at least fill the available space */
+  border-collapse: collapse;
+}
+
+/* Prevent cell contents from wrapping so columns keep their width. */
+.table-scroll-wrap th,
+.table-scroll-wrap td {
+  white-space: nowrap;
+}
+
+th.px-6 {
+  background-color: unset;
+  background: unset;
+  border-width: 1px;
+  border-color: var(--tw-translate-x);
+  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.15);
+}
+
+/* Preserve focus outline for accessibility when wrapper is focused */
+.table-scroll-wrap:focus {
+  outline: none;
+}

@@ -1,0 +1,9 @@
+/* Navbar container and logo styles */
+.max-w-\[1600px\] {
+  background-color: rgba(245, 244, 240, 1);
+  border-image: radial-gradient(circle at 50% 50%, rgba(15, 17, 41, 1) 0%, rgba(255, 255, 255, 1) 100%) 1;
+}
+
+img.h-12 {
+  color: rgba(26, 27, 24, 1);
+}

@@ -1,0 +1,197 @@
+/* =========================================================
+   GLOBAL – prevent any page-level horizontal scroll
+   ========================================================= */
+html,
+body {
+
+  /* mirrors 67% browser zoom — matches user's preferred view */
+  overflow-x: hidden;
+  /* NO full-page horizontal scroll */
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Prevent main from causing horizontal page overflow */
+main {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+main.flex-1 {
+  background-color: rgba(245, 244, 240, 1);
+}
+
+/* Top header full-width background wrapper + centered container */
+.top-header-wrapper {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.top-header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  background-color: rgba(0, 41, 82, 1);
+}
+
+/* =========================================================
+   LAYOUT – flex container: filter sidebar + content area
+   ========================================================= */
+.content-row {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+  /* small clean gap */
+  align-items: stretch;
+  /* Stretch sidebar height to match table height */
+}
+
+/* Filter sidebar: fixed 260px, never shrinks */
+.filter-aside {
+  flex: 0 0 280px;
+  /* slightly wider */
+  width: 280px;
+  min-width: 280px;
+  margin-left: 20px;
+}
+
+/* Content area: takes all remaining space.
+   min-width:0 is CRITICAL to prevent flex overflow. */
+.content-row>section {
+  flex: 1;
+  min-width: 0;
+  /* CRITICAL */
+}
+
+/* =========================================================
+   TABLE WRAPPER – horizontal scroll ONLY inside the table
+   ========================================================= */
+.table-scroll-wrap {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  /* horizontal scroll lives HERE only */
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  /* space for scrollbar */
+}
+
+/* Force table to its natural width so scrollbar kicks in */
+.table-scroll-wrap table,
+.table-scroll-wrap table.min-w-full {
+  display: table !important;
+  width: auto !important;
+  min-width: max-content !important;
+  /* expand to show all columns */
+}
+
+/* =========================================================
+   TABLE CELL DENSITY
+   ========================================================= */
+.table-scroll-wrap thead th {
+  padding-top: 6px !important;
+  padding-bottom: 6px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  font-size: 12px !important;
+  white-space: nowrap;
+}
+
+.table-scroll-wrap tbody td {
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  font-size: 13px !important;
+}
+
+/* First column: small left padding */
+.table-scroll-wrap thead th:first-child,
+.table-scroll-wrap tbody td:first-child {
+  padding-left: 8px !important;
+}
+
+/* =========================================================
+   FILTER PANEL INSIDE ASIDE
+   ========================================================= */
+/* No extra right margin/padding on aside */
+.filter-aside {
+  margin-right: 0;
+}
+
+/* Subtle separator between filter and table */
+.filter-aside .filter-panel {
+  border-right-width: 1px;
+  border-right-style: solid;
+  border-right-color: rgba(2, 6, 23, 0.06);
+}
+
+/* Table card: no extra left margin */
+.content-row>section .bg-white {
+  margin-left: 0;
+  border-left: none;
+}
+
+/* =========================================================
+   MISC – reset transforms to prevent layout issues
+   ========================================================= */
+body,
+.content-row,
+.table-scroll-wrap,
+.filter-aside {
+  transform: none !important;
+}
+
+/* =========================================================
+   SCROLLBAR STYLING – visible & styled
+   ========================================================= */
+.table-scroll-wrap::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.table-scroll-wrap::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 10px;
+}
+
+.table-scroll-wrap::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.22);
+  border-radius: 10px;
+}
+
+.table-scroll-wrap::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.4);
+}
+
+/* =========================================================
+   FOOTER button compact sizing
+   ========================================================= */
+.filter-footer .btn-cancel,
+.filter-footer .btn-apply,
+.filter-footer .reset-link {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+}

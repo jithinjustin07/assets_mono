@@ -1,0 +1,190 @@
+{
+  "reportDate": "2026-02-13",
+  "asOfLabel": "As of February 13, 2026",
+  "kpiMeta": {
+    "totalAumTrend": "+2.5%",
+    "newAccounts": 2
+  },
+  "filterConfig": [
+    {
+      "key": "reportDate",
+      "label": "Report Date",
+      "type": "date",
+      "icon": "calendar_today",
+      "defaultValue": "2026-02-13",
+      "span": "full",
+      "matchable": false
+    },
+    {
+      "key": "advisor",
+      "label": "Advisor",
+      "type": "multiselect",
+      "icon": "person",
+      "options": [
+        "Avestar",
+        "India",
+        "Patwa"
+      ],
+      "defaultValue": [],
+      "matchable": true
+    },
+    {
+      "key": "provider",
+      "label": "Data Provider",
+      "type": "multiselect",
+      "icon": "storage",
+      "options": [
+        "ByAll Accounts",
+        "External Alternatives",
+        "FOS",
+        "Internal Alternatives",
+        "Manual",
+        "Pershing",
+        "Schwab"
+      ],
+      "defaultValue": [],
+      "matchable": true
+    },
+    {
+      "key": "addeparRange",
+      "label": "Addepar AUM Range ($)",
+      "type": "range",
+      "icon": "pie_chart",
+      "defaultValue": {
+        "min": "",
+        "max": ""
+      },
+      "matchable": true
+    },
+    {
+      "key": "bdRange",
+      "label": "Black Diamond Range ($)",
+      "type": "range",
+      "icon": "diamond",
+      "defaultValue": {
+        "min": "",
+        "max": ""
+      },
+      "matchable": true
+    },
+    {
+      "key": "platformView",
+      "label": "Platform View",
+      "type": "multiselect",
+      "icon": "visibility",
+      "options": [
+        "Addepar",
+        "Black Diamond"
+      ],
+      "defaultValue": [],
+      "matchable": true
+    }
+  ],
+  "rows": [
+    {
+      "advisor": "Avestar",
+      "provider": "Internal Alternatives",
+      "aua": 5240500.00,
+      "addepar": 20353350.00,
+      "blackdiamond": 0.00
+    },
+    {
+      "advisor": "Avestar",
+      "provider": "Pershing",
+      "aua": 1245000.00,
+      "addepar": 0.00,
+      "blackdiamond": 845310.00
+    },
+    {
+      "advisor": "Avestar",
+      "provider": "Schwab",
+      "aua": 3120000.00,
+      "addepar": 0.00,
+      "blackdiamond": 4043000.00
+    },
+    {
+      "advisor": "Fos",
+      "provider": "External Alternatives",
+      "aua": 850000.00,
+      "addepar": 0.00,
+      "blackdiamond": 776210.00
+    },
+    {
+      "advisor": "Fos",
+      "provider": "FOS",
+      "aua": 1560000.00,
+      "addepar": 0.00,
+      "blackdiamond": 2846300.00
+    },
+    {
+      "advisor": "Fos",
+      "provider": "Internal Alternatives",
+      "aua": 4230000.00,
+      "addepar": 11846790.00,
+      "blackdiamond": 0.00
+    },
+    {
+      "advisor": "Fos",
+      "provider": "Manual",
+      "aua": 120000.00,
+      "addepar": 0.00,
+      "blackdiamond": 598320.00
+    },
+    {
+      "advisor": "India",
+      "provider": "ByAll Accounts",
+      "aua": 985000.00,
+      "addepar": 0.00,
+      "blackdiamond": 1354990.00
+    },
+    {
+      "advisor": "India",
+      "provider": "External Alternatives",
+      "aua": 1450000.00,
+      "addepar": 0.00,
+      "blackdiamond": 1867450.00
+    },
+    {
+      "advisor": "India",
+      "provider": "Internal Alternatives",
+      "aua": 3890000.00,
+      "addepar": 11080770.00,
+      "blackdiamond": 0.00
+    },
+    {
+      "advisor": "India",
+      "provider": "Pershing",
+      "aua": 2100000.00,
+      "addepar": 0.00,
+      "blackdiamond": 1974970.00
+    },
+    {
+      "advisor": "India",
+      "provider": "Schwab",
+      "aua": 1120000.00,
+      "addepar": 0.00,
+      "blackdiamond": 932450.00
+    },
+    {
+      "advisor": "Patwa",
+      "provider": "ByAll Accounts",
+      "aua": 1340000.00,
+      "addepar": 0.00,
+      "blackdiamond": 1422340.00
+    },
+    {
+      "advisor": "Patwa",
+      "provider": "Internal Alternatives",
+      "aua": 5670000.00,
+      "addepar": 17344680.00,
+      "blackdiamond": 0.00
+    },
+    {
+      "advisor": "Patwa",
+      "provider": "Manual",
+      "aua": 1890000.00,
+      "addepar": 0.00,
+      "blackdiamond": 2447450.00
+    }
+  ]
+}

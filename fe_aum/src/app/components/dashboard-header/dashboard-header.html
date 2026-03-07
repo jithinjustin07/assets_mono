@@ -1,0 +1,77 @@
+<div class="text-center mb-2 pb-4">
+  <div>
+    <h2 class="text-2xl font-serif font-semibold text-[#0a1947]">Assets Under Management Report</h2>
+  </div>
+
+  <div class="mt-4 flex items-center justify-between w-full mx-auto px-4 relative">
+    <div class="flex-1"></div>
+    <div class="flex flex-none justify-center">
+      <div #tabSwitcher class="tab-switcher flex py-3 text-sm font-medium relative">
+
+        <button #dashboardTab type="button" (click)="onTabClick('summary')"
+          [ngClass]="svc.viewMode() === 'summary' ? 'tab-btn tab-btn-active' : 'tab-btn'"
+          class="bg-transparent focus:outline-none">
+          <span class="tab-text">Report</span>
+        </button>
+
+        <button #dataTab type="button" (click)="onTabClick('data')"
+          [ngClass]="svc.viewMode() === 'data' ? 'tab-btn tab-btn-active' : 'tab-btn'"
+          class="bg-transparent focus:outline-none">
+          <span class="tab-text">Data</span>
+        </button>
+
+        <div #tabIndicator class="tab-indicator"></div>
+
+      </div>
+    </div>
+
+    <div class="flex-1 flex justify-end items-center gap-4">
+      <!-- Generate Button -->
+      <button (click)="svc.exportExcel()"
+        class="inline-flex items-center px-4 py-2 border border-slate-200 rounded-lg bg-black text-sm font-medium text-white hover:bg-slate-900 transition-colors">
+        <span class="material-icons text-base mr-2 text-slate-100">file_download</span>
+        Generate
+      </button>
+
+      <!-- Column Picker (Data view only) -->
+      @if (svc.viewMode() === 'data') {
+      <div class="relative">
+        <button (click)="toggleColumnPicker()"
+          class="inline-flex items-center px-4 py-2 border border-slate-200 rounded-lg bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+          <span class="material-icons text-base mr-2">view_column</span>
+          Columns
+          <span class="material-icons text-sm ml-1 transform transition-transform"
+            [class.rotate-180]="showColumnPicker()">expand_more</span>
+        </button>
+
+        @if (showColumnPicker()) {
+        <div
+          class="absolute right-0 mt-2 w-64 bg-white border border-slate-200 rounded-lg shadow-xl z-50 p-3 max-h-[500px] overflow-y-auto custom-scrollbar text-left">
+          <div class="flex items-center justify-between mb-2 pb-2 border-b border-slate-100">
+            <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Visible Columns</h4>
+            <label class="flex items-center gap-2 px-1 cursor-pointer group">
+              <input type="checkbox" [checked]="isAllColumnsSelected()" (change)="onToggleAll($event)"
+                class="w-3.5 h-3.5 rounded border-slate-300 text-[#003366] focus:ring-[#003366]" />
+              <span
+                class="text-[10px] font-bold text-slate-500 uppercase group-hover:text-slate-900 transition-colors">All</span>
+            </label>
+          </div>
+          <div class="grid grid-cols-1 gap-1">
+            @for (col of svc.dataColumns(); track col) {
+            <label class="flex items-center gap-3 p-2 hover:bg-slate-50 rounded cursor-pointer transition-colors group">
+              <input type="checkbox" [checked]="svc.isColumnVisible(col)" (change)="svc.toggleDataColumn(col)"
+                class="w-4 h-4 rounded border-slate-300 text-[#003366] focus:ring-[#003366]" />
+              <span class="text-sm text-slate-600 group-hover:text-slate-900">{{ col }}</span>
+            </label>
+            }
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+
+    <input type="text" placeholder="Search "
+      class="w-[200.637px] pl-10 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003366] transition-all" />
+  </div>
+</div>

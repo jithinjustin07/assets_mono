@@ -1,0 +1,235 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.filter-wrapper {
+  position: relative;
+  width: 280px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: auto;
+  display: block;
+  min-width: 280px;
+  margin-top: 0px;
+
+  /* Adjusted for visual alignment */
+}
+
+/* Panel fills the wrapper */
+.filter-panel {
+  width: 100%;
+  height: 100%;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  z-index: 1;
+  /* border-radius: 8px; */
+  /* Restored to match table */
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  /* Standard 1px border like table */
+}
+
+/* Ensure the grid aligns to top and filter column is visible */
+.data-with-filter {
+  align-items: start;
+}
+
+.filter-column {
+  position: absolute;
+  z-index: 5;
+}
+
+.table-column {
+  position: relative;
+  z-index: 1;
+}
+
+/* Filter header: use the same solid table header color for consistency */
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 40.8px;
+  padding: 12px 16px;
+  /* similar vertical rhythm to table th */
+  border-bottom: 1px solid rgba(238, 242, 247, 0.8);
+  background-color: rgba(9, 10, 27, 1);
+  color: white;
+}
+
+.filter-header .material-icons {
+  color: white;
+}
+
+.filter-header h3 {
+  color: white;
+  margin: 0;
+  font-size: 14px;
+}
+
+.close-btn {
+  background: transparent;
+  border: 0;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 6px;
+  border-radius: 6px;
+}
+
+/* Body should scroll independently and match table's padding */
+.filter-body {
+  padding: 8px 14px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+/* Tighter spacing for groups */
+.filter-group {
+  margin-bottom: 12px;
+}
+
+.filter-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.fsec-label {
+  font-weight: 600;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.clear-link {
+  color: #4b5563;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: underline;
+}
+
+.ms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.ms-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.ms-item input {
+  width: 14px;
+  height: 14px;
+  accent-color: #000000;
+}
+
+.ms-item.selected {
+  background: rgba(0, 51, 102, 0.03);
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
+.input-field {
+  width: 100%;
+  height: 34px;
+  padding: 6px 10px;
+  border: 1px solid #e6eef6;
+  border-radius: 6px;
+  outline: none;
+  font-size: 13px
+}
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.range-row .input-field {
+  width: 48%;
+}
+
+.range-sep {
+  width: 10%;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* Compact buttons: smaller padding, smaller font, lighter look */
+.filter-footer {
+  padding: 6px 12px;
+  border-top: 1px solid #eef2f7;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.reset-link {
+  color: #374151;
+  text-decoration: underline;
+  background: transparent;
+  border: 0;
+  font-size: 12px;
+  padding: 6px 8px
+}
+
+.footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-cancel {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #e6eef6;
+  background: #fff;
+  color: #374151;
+  font-size: 12px
+}
+
+.btn-apply {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 0;
+  background: #003366;
+  color: #fff;
+  font-size: 12px
+}
+
+/* make sure scrollbar is thin and visible */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.12);
+  border-radius: 6px;
+}
+
+/* Responsive: collapse to top when viewport is narrow */
+@media (max-width: 900px) {
+  .data-with-filter {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-wrapper {
+    width: 100%;
+  }
+
+  .filter-panel {
+    border-radius: 8px;
+  }
+}

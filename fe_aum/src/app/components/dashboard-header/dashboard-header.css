@@ -1,0 +1,63 @@
+/* Dashboard header title styling */
+h2.text-2xl {
+  background-color: rgba(245, 244, 240, 1);
+  backdrop-filter: none;
+  border-width: 0px;
+  border-color: rgba(0, 0, 0, 0);
+  border-style: none;
+  border-image: none;
+}
+
+/* Dashboard/Data tab buttons with animated underline */
+.tab-btn {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  color: rgb(100 116 139); /* tailwind slate-500 */
+}
+
+.tab-btn:hover {
+  color: black;
+  transform: scale(1.08);
+}
+
+.tab-btn-active {
+  color: black;
+}
+
+.tab-switcher {
+  position: relative;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.tab-btn:not(:last-child) {
+  margin-right: 2.5rem; /* same spacing as space-x-10 */
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background-color: rgb(0, 0, 0);
+  border-radius: 9999px;
+  width: 0;
+  transform: translateX(0);
+  pointer-events: none;
+    transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

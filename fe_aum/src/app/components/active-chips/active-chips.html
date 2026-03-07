@@ -1,0 +1,15 @@
+<div class="active-chips-slot">
+  @if (activeFilters.length > 0) {
+    <div class="flex flex-wrap gap-2">
+      @for (item of activeFilters; track item.config.key) {
+        <span class="chip">
+          <span style="color:#94a3b8;margin-right:2px">{{ item.config.label }}:</span>
+          {{ item.label }}
+          <button (click)="removeChip(item.config.key)" title="Remove">
+            <span class="material-icons" style="font-size:12px;line-height:1">close</span>
+          </button>
+        </span>
+      }
+    </div>
+  }
+ </div>

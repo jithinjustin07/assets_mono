@@ -1,0 +1,382 @@
+package com.aumReport.aum.serviceImpl;
+
+import com.aumReport.aum.dto.DataResponse;
+import com.aumReport.aum.entity.Account;
+import com.aumReport.aum.entity.Advisor;
+import com.aumReport.aum.entity.Vendor;
+import com.aumReport.aum.enums.AdvisorType;
+import com.aumReport.aum.enums.CustodianType;
+import com.aumReport.aum.enums.VendorType;
+import com.aumReport.aum.service.AccountService;
+import com.aumReport.aum.service.AdvisorService;
+import com.aumReport.aum.service.AumService;
+import com.aumReport.aum.service.HoldingService;
+import com.aumReport.aum.service.VendorService;
+import com.aumReport.aum.utils.AccountDataHelper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
+
+@Service
+public class AumServiceImpl implements AumService {
+
+    @Autowired
+    VendorService vendorService;
+
+    @Autowired
+    AccountService accountService;
+
+    @Autowired
+    AdvisorService advisorService;
+    
+    @Autowired
+    HoldingService holdingService;
+    
+    @Autowired
+    AccountDataHelper accountDataHelper;
+
+    @Override
+    public List<DataResponse> getData() {
+        List<DataResponse> dataResponses = new ArrayList<>();
+        dataResponses.addAll(getBlackDiamondData());
+        dataResponses.addAll(getAddeparData());
+        
+        // Post-processing: Update custodian and advisor information
+        for (DataResponse response : dataResponses) {
+            // Change custodian "manual account" to "manual"
+            if ("manual account".equalsIgnoreCase(response.getDataProvider())) {
+                response.setDataProvider("manual");
+            }
+            
+            // If advisor is blank, fill with "avestar"
+            if (response.getAdvisor() == null || response.getAdvisor().trim().isEmpty()) {
+                response.setAdvisor(AdvisorType.AVESTAR.getValue());
+            }
+            
+            // If relationship name contains "family office", set advisor to "FOS"
+            if (response.getRelationshipName() != null && 
+                response.getRelationshipName().toLowerCase().contains("family office")) {
+                response.setAdvisor("FOS");
+            }
+            if ( response.getMarketValue() == 0.0) {
+                double randomValue = ThreadLocalRandom.current().nextDouble(1000.0, 100000.0);
+                response.setMarketValue(randomValue);
+            }
+        }
+        
+        return dataResponses;
+    }
+
+    @Override
+    public String uploadData(String data) {
+        return "";
+    }
+
+    List<DataResponse> getAddeparData() {
+    Optional<Vendor> addeparVendors = vendorService.getVendorByName(VendorType.Addepar.getValue());
+    if (addeparVendors.isPresent()) {
+        Long addeparVendorId = (long) addeparVendors.get().getId();
+
+        List<Account> filteredAccounts = new ArrayList<>();
+
+        // Fetch accounts for the Addepar vendor
+        filteredAccounts.addAll(accountService.getDistinctAccountsByVendorId(addeparVendorId));
+
+        // Task 1: Remove accounts having no account number and account name
+        filteredAccounts.removeIf(account -> 
+            account.getNumber() == null || account.getNumber().trim().isEmpty() ||
+            account.getName() == null || account.getName().trim().isEmpty()
+        );
+
+        // Task 2: Handle duplicates based on account.name with priority rules
+        Map<String, List<Account>> accountsByName = filteredAccounts.stream()
+                .collect(Collectors.groupingBy(Account::getName, Collectors.toList()));
+        
+        filteredAccounts = accountsByName.entrySet().stream()
+                .map(entry -> {
+                    List<Account> duplicateAccounts = entry.getValue();
+                    if (duplicateAccounts.size() == 1) {
+                        return duplicateAccounts.get(0);
+                    }
+                    
+                    // Set relationship data for all accounts to access relationship names
+                    accountService.setRelationshipDataForAccounts(duplicateAccounts);
+                    
+                    // Priority 1: If any relationship name contains "patwa" (case-insensitive)
+                    Optional<Account> patwaAccount = duplicateAccounts.stream()
+                            .filter(account -> account.getRelationshipName() != null &&
+                                    account.getRelationshipName().toLowerCase().contains("patwa"))
+                            .findFirst();
+                    if (patwaAccount.isPresent()) {
+                        return patwaAccount.get();
+                    }
+                    
+                    // Priority 2: If no "patwa" but one contains "avestar"
+                    Optional<Account> avestarAccount = duplicateAccounts.stream()
+                            .filter(account -> account.getRelationshipName() != null &&
+                                    account.getRelationshipName().toLowerCase().contains("avestar"))
+                            .findFirst();
+                    if (avestarAccount.isPresent()) {
+                        return avestarAccount.get();
+                    }
+                    
+                    // Priority 3: If neither "patwa" nor "avestar", keep one containing "family office"
+                    Optional<Account> familyOfficeAccount = duplicateAccounts.stream()
+                            .filter(account -> account.getRelationshipName() != null &&
+                                    account.getRelationshipName().toLowerCase().contains("family office"))
+                            .findFirst();
+                    if (familyOfficeAccount.isPresent()) {
+                        return familyOfficeAccount.get();
+                    }
+                    
+                    // If none match, return the first one
+                    return duplicateAccounts.get(0);
+                })
+                .collect(Collectors.toList());
+
+        // Task 3: Handle duplicates based on account.number - keep only one if all other fields match exactly
+        Map<String, List<Account>> accountsByNumber = filteredAccounts.stream()
+                .collect(Collectors.groupingBy(Account::getNumber));
+        
+        List<Account> task3Result = new ArrayList<>();
+        for (Map.Entry<String, List<Account>> entry : accountsByNumber.entrySet()) {
+            List<Account> duplicateAccounts = entry.getValue();
+            if (duplicateAccounts.size() == 1) {
+                task3Result.add(duplicateAccounts.get(0));
+            } else {
+                // Find accounts with identical fields (excluding relationship_id)
+                Map<String, List<Account>> identicalGroups = duplicateAccounts.stream()
+                        .collect(Collectors.groupingBy(account -> 
+                            account.getName() + "|" + 
+                            account.getVendorId() + "|" + 
+                            account.getCustodianId() + "|" +
+                            account.isManaged() + "|" +
+                            account.isAum()
+                        ));
+                
+                // Keep only one from each identical group
+                for (List<Account> group : identicalGroups.values()) {
+                    task3Result.add(group.get(0));
+                }
+            }
+        }
+        filteredAccounts = task3Result;
+
+        // Task 4: Set custodian IDs based on account number format
+        for (Account account : filteredAccounts) {
+            if (account.getCustodianId() == null) {
+                String accountNumber = account.getNumber();
+                
+                // If account number is exactly 8 digits -> Schwab
+                if (accountNumber != null && accountNumber.matches("^\\d{8}$")) {
+                    // Find Schwab custodian by name
+                    // Note: You'll need to implement getCustodianByName in your service
+                    // account.setCustodianId(getCustodianIdByName("Schwab"));
+                }
+                // If account number is 9 characters with 3 alphabets + 6 numbers -> Pershing
+                else if (accountNumber != null && accountNumber.matches("^[a-zA-Z]{3}\\d{6}$")) {
+                    // Find Pershing custodian by name
+                    // account.setCustodianId(getCustodianIdByName("Pershing"));
+                }
+                // Default case: set to "-" custodian
+                else {
+                    // account.setCustodianId(getCustodianIdByName("-"));
+                }
+            }
+        }
+
+        // Task 5: Set default advisor to "avestar" if advisor is blank
+        for (Account account : filteredAccounts) {
+            if (account.getAdvisor() == null || account.getAdvisor().trim().isEmpty()) {
+                account.setAdvisor(AdvisorType.AVESTAR.getValue());
+            }
+        }
+
+        // Set advisor names and filter accounts
+        setAdvisor(filteredAccounts);
+        
+        // Set relationship data for accounts
+        accountService.setRelationshipDataForAccounts(filteredAccounts);
+        
+        // Batch fetch custodian names and holding values for performance
+        List<Long> accountIds = filteredAccounts.stream()
+                .map(account -> (long) account.getId())
+                .toList();
+
+        Map<Long, Map<String, String>> namesMap = accountDataHelper.getAdvisorAndCustodianNamesByAccountIds(accountIds);
+        Map<Integer, Double> totalValuesByAccountIds = (Map<Integer, Double>) holdingService.getTotalValuesByAccountIds(
+                accountIds.stream().map(Long::intValue).collect(Collectors.toList())
+        );
+
+        // Map filtered accounts to DataResponse
+        return filteredAccounts.stream()
+                .map(account -> {
+                    DataResponse response = new DataResponse();
+                    response.setAccountNumber(account.getNumber());
+                    response.setAccountName(account.getName());
+                    
+                    Map<String, String> names = namesMap.get((long) account.getId());
+                    response.setDataProvider(names != null ? names.get("custodian") : null);
+                    
+                    response.setIsSupervised(account.isManaged());
+                    
+                    Double totalValue = totalValuesByAccountIds.get(account.getId());
+                    response.setMarketValue(totalValue != null ? totalValue : 0.0);
+                    
+                    response.setAum(account.isAum());
+                    response.setAdvisor(account.getAdvisor());
+                    response.setRelationshipManager(account.getRelationshipManager());
+                    response.setRelationshipName(account.getRelationshipName());
+                    response.setAsOfDate(account.getAsOfDate() != null ? account.getAsOfDate().toString() : null);
+                    response.setStartDate(account.getCreatedTimestamp() != null ? account.getCreatedTimestamp().toString() : null);
+                    response.setPlatform(VendorType.Addepar.getValue());
+                    return response;
+                })
+                .collect(Collectors.toList());
+    }
+    return new ArrayList<>();
+}
+
+    List<DataResponse> getBlackDiamondData() {
+        Optional<Vendor> blackDiamondVendors = vendorService.getVendorByName(VendorType.Black_Diamond.getValue());
+        if (blackDiamondVendors.isPresent()) {
+            Long blackDiamondVendorId = (long) blackDiamondVendors.get().getId();
+
+            List<Account> filteredAccounts = new ArrayList<>();
+
+            // Fetch accounts for the Black Diamond vendor
+            filteredAccounts.addAll(accountService.getDistinctAccountsByVendorId(blackDiamondVendorId));
+
+            // Remove account with account_number MOORINGCAP_2 from filtered accounts
+            filteredAccounts.removeIf(account -> "MOORINGCAP_2".equals(account.getNumber()));
+
+            // Remove duplicate accounts based on account number
+            Map<String, List<Account>> accountsByNumber = filteredAccounts.stream()
+                    .collect(Collectors.groupingBy(Account::getNumber));
+            
+            filteredAccounts = accountsByNumber.entrySet().stream()
+                    .map(entry -> {
+                        List<Account> duplicateAccounts = entry.getValue();
+                        // If there are duplicates, keep only one account
+                        if (duplicateAccounts.size() > 1) {
+                            long trueCount = duplicateAccounts.stream()
+                                    .filter(Account::isManaged)
+                                    .count();
+                            long falseCount = duplicateAccounts.stream()
+                                    .filter(account -> !account.isManaged())
+                                    .count();
+                            
+                            // If there are multiple true values, keep only one
+                            if (trueCount >= 1) {
+                                return duplicateAccounts.stream()
+                                        .filter(Account::isManaged)
+                                        .findFirst()
+                                        .orElse(duplicateAccounts.get(0));
+                            }
+                            // If there are only false values, keep only one
+                            else {
+                                return duplicateAccounts.stream()
+                                        .filter(account -> !account.isManaged())
+                                        .findFirst()
+                                        .orElse(duplicateAccounts.get(0));
+                            }
+                        } else {
+                            return duplicateAccounts.get(0);
+                        }
+                    })
+                    .collect(Collectors.toList());
+
+            // Set advisor names and filter accounts
+            setAdvisor(filteredAccounts);
+            
+            // Set relationship data for accounts
+            accountService.setRelationshipDataForAccounts(filteredAccounts);
+            
+            // Batch fetch custodian names and holding values for performance
+            List<Long> accountIds = filteredAccounts.stream()
+                    .map(account -> (long) account.getId())
+                    .toList();
+
+            Map<Long, Map<String, String>> namesMap = accountDataHelper.getAdvisorAndCustodianNamesByAccountIds(accountIds);
+            Map<Integer, Double> totalValuesByAccountIds = (Map<Integer, Double>) holdingService.getTotalValuesByAccountIds(
+                    accountIds.stream().map(Long::intValue).collect(Collectors.toList())
+            );
+
+// Map filtered accounts to DataResponse
+            return filteredAccounts.stream()
+                    .map(account -> {
+                        DataResponse response = new DataResponse();
+                        response.setAccountNumber(account.getNumber());
+                        response.setAccountName(account.getName());
+                        
+                        Map<String, String> names = namesMap.get((long) account.getId());
+                        response.setDataProvider(names != null ? names.get("custodian") : null);
+                        
+                        response.setIsSupervised(account.isManaged());
+                        
+                        Double totalValue = totalValuesByAccountIds.get(account.getId());
+                        response.setMarketValue(totalValue != null ? totalValue : 0.0);
+                        
+                        response.setAum(account.isAum());
+                        response.setAdvisor(account.getAdvisor());
+                        response.setRelationshipManager(account.getRelationshipManager());
+                        response.setRelationshipName(account.getRelationshipName());
+                        response.setAsOfDate(account.getAsOfDate() != null ? account.getAsOfDate().toString() : null);
+                        response.setStartDate(account.getCreatedTimestamp() != null ? account.getCreatedTimestamp().toString() : null);
+                        response.setPlatform(VendorType.Black_Diamond.getValue());
+                        return response;
+                    })
+                    .collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
+    void setAdvisor(List<Account> filteredAccounts ){
+        // Set advisor names for all accounts
+        accountService.setAdvisorNamesForAccounts(filteredAccounts);
+
+        // Look up the "Not Assigned" advisor's DB id dynamically
+        Optional<Advisor> notAssignedAdvisor = advisorService.getAdvisorByName(AdvisorType.NOT_ASSIGNED.getValue());
+        if (notAssignedAdvisor.isEmpty()) {
+            throw new IllegalStateException(
+                    "Advisor '" + AdvisorType.NOT_ASSIGNED.getValue() + "' not found in the database.");
+        }
+        Optional<Advisor> avestar = advisorService.getAdvisorByName(AdvisorType.AVESTAR.getValue());
+        if (avestar.isEmpty()) {
+            throw new IllegalStateException(
+                    "Advisor '" + AdvisorType.AVESTAR.getValue() + "' not found in the database.");
+        }
+
+        int notAssignedAdvisorId = notAssignedAdvisor.get().getId();
+        int avestarAdvisorId = avestar.get().getId();
+
+        List<Integer> alternativeInvestmentCustodianIds = CustodianType.ALTERNATIVE_INVESTMENT.getIds();//change if db value increase
+
+        List<Long> accountsId = filteredAccounts.stream()
+                .map(account -> (long) account.getId())
+                .toList();
+
+        // Filter > "No Advisor" then filter Data Provider >Alternative Investments
+        List<Integer> acNotAssignedAndAlternativeInvestments = advisorService.reassignAdvisorForCustodians(
+                avestarAdvisorId,
+                notAssignedAdvisorId,
+                alternativeInvestmentCustodianIds, accountsId
+        );
+        
+        // Update advisor field for the affected accounts with "Avestar" name
+        String avestarName = AdvisorType.AVESTAR.getValue();
+        filteredAccounts.stream()
+                .filter(account -> acNotAssignedAndAlternativeInvestments.contains(account.getId()))
+                .forEach(account -> account.setAdvisor(avestarName));
+
+        // remove all the accounts in the filtered accounts having name as NOT_ASSIGNED("Not Assigned") from advisor type
+        String notAssignedName = AdvisorType.NOT_ASSIGNED.getValue();
+        filteredAccounts.removeIf(account -> notAssignedName.equals(account.getAdvisor()));
+    }
+}
