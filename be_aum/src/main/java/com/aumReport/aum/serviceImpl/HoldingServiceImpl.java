@@ -65,17 +65,6 @@ public class HoldingServiceImpl implements HoldingService {
     }
     
     @Override
-    public Map<Integer, Double> getTotalValuesByAccountIds(List<Integer> accountIds) {
-        List<Object[]> results = holdingRepository.getTotalValuesByAccountIds(accountIds);
-        
-        return results.stream()
-                .collect(Collectors.toMap(
-                        result -> (Integer) result[0],
-                        result -> (Double) result[1]
-                ));
-    }
-    
-    @Override
     public Double getTotalValueByAccountId(int accountId) {
         return holdingRepository.getTotalValueByAccountId(accountId);
     }

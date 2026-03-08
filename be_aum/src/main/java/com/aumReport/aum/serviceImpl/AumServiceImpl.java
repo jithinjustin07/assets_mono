@@ -64,10 +64,7 @@ public class AumServiceImpl implements AumService {
                 response.getRelationshipName().toLowerCase().contains("family office")) {
                 response.setAdvisor("FOS");
             }
-            if ( response.getMarketValue() == 0.0) {
-                double randomValue = ThreadLocalRandom.current().nextDouble(1000.0, 100000.0);
-                response.setMarketValue(randomValue);
-            }
+
         }
         
         return dataResponses;
@@ -131,12 +128,9 @@ public class AumServiceImpl implements AumService {
                             .filter(account -> account.getRelationshipName() != null &&
                                     account.getRelationshipName().toLowerCase().contains("family office"))
                             .findFirst();
-                    if (familyOfficeAccount.isPresent()) {
-                        return familyOfficeAccount.get();
-                    }
+                    return familyOfficeAccount.orElseGet(duplicateAccounts::getFirst);
                     
                     // If none match, return the first one
-                    return duplicateAccounts.get(0);
                 })
                 .collect(Collectors.toList());
 
@@ -177,7 +171,7 @@ public class AumServiceImpl implements AumService {
                 if (accountNumber != null && accountNumber.matches("^\\d{8}$")) {
                     // Find Schwab custodian by name
                     // Note: You'll need to implement getCustodianByName in your service
-                    // account.setCustodianId(getCustodianIdByName("Schwab"));
+//                     account.setCustodianId(getCustodianIdByName("Schwab"));
                 }
                 // If account number is 9 characters with 3 alphabets + 6 numbers -> Pershing
                 else if (accountNumber != null && accountNumber.matches("^[a-zA-Z]{3}\\d{6}$")) {
@@ -210,9 +204,6 @@ public class AumServiceImpl implements AumService {
                 .toList();
 
         Map<Long, Map<String, String>> namesMap = accountDataHelper.getAdvisorAndCustodianNamesByAccountIds(accountIds);
-        Map<Integer, Double> totalValuesByAccountIds = (Map<Integer, Double>) holdingService.getTotalValuesByAccountIds(
-                accountIds.stream().map(Long::intValue).collect(Collectors.toList())
-        );
 
         // Map filtered accounts to DataResponse
         return filteredAccounts.stream()
@@ -226,7 +217,7 @@ public class AumServiceImpl implements AumService {
                     
                     response.setIsSupervised(account.isManaged());
                     
-                    Double totalValue = totalValuesByAccountIds.get(account.getId());
+                    Double totalValue = holdingService.getTotalValueByAccountId(account.getId());
                     response.setMarketValue(totalValue != null ? totalValue : 0.0);
                     
                     response.setAum(account.isAum());
@@ -304,9 +295,7 @@ public class AumServiceImpl implements AumService {
                     .toList();
 
             Map<Long, Map<String, String>> namesMap = accountDataHelper.getAdvisorAndCustodianNamesByAccountIds(accountIds);
-            Map<Integer, Double> totalValuesByAccountIds = (Map<Integer, Double>) holdingService.getTotalValuesByAccountIds(
-                    accountIds.stream().map(Long::intValue).collect(Collectors.toList())
-            );
+
 
 // Map filtered accounts to DataResponse
             return filteredAccounts.stream()
@@ -320,7 +309,7 @@ public class AumServiceImpl implements AumService {
                         
                         response.setIsSupervised(account.isManaged());
                         
-                        Double totalValue = totalValuesByAccountIds.get(account.getId());
+                        Double totalValue = holdingService.getTotalValueByAccountId(account.getId());
                         response.setMarketValue(totalValue != null ? totalValue : 0.0);
                         
                         response.setAum(account.isAum());
