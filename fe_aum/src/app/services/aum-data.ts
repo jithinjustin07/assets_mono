@@ -1,6 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { take, catchError, of } from 'rxjs';
 import {
   AumRow,
   FilterConfig,
@@ -262,60 +261,30 @@ export class AumDataService {
   constructor(private http: HttpClient) { }
 
   loadData(): void {
-    // Load data with optimized strategy
+    // Load data from backend APIs
     this.loadBackendData();
-    // Load other data after main data is loaded
-    setTimeout(() => {
-      this.loadCustodians();
-      this.loadAdvisors();
-    }, 100);
+    this.loadCustodians();
+    this.loadAdvisors();
   }
 
   private loadBackendData(): void {
-    // Add caching and error handling
-    const cacheKey = 'aum_backend_data';
-    const cached = localStorage.getItem(cacheKey);
-    const cacheTime = localStorage.getItem(cacheKey + '_time');
-    const now = Date.now();
-    
-    // Use cache if less than 5 minutes old
-    if (cached && cacheTime && (now - parseInt(cacheTime)) < 300000) {
-      const data = JSON.parse(cached);
-      this.processBackendData(data);
-      return;
-    }
+    this.http.get<BackendDataResponse[]>('/api/aum/data').subscribe(data => {
+      this.backendData.set(data);
 
-    this.http.get<BackendDataResponse[]>('/api/aum/data').pipe(
-      take(1),
-      catchError(err => {
-        console.error('Failed to load backend data:', err);
-        // Try to use cached data as fallback
-        if (cached) {
-          const data = JSON.parse(cached);
-          this.processBackendData(data);
-        }
-        return of([]);
-      })
-    ).subscribe(data => {
-      // Cache the data
-      localStorage.setItem(cacheKey, JSON.stringify(data));
-      localStorage.setItem(cacheKey + '_time', now.toString());
-      this.processBackendData(data);
-    });
-  }
-
-  private processBackendData(data: BackendDataResponse[]): void {
-    this.backendData.set(data);
-
-    // Use Web Worker for heavy data transformation
-    if (typeof Worker !== 'undefined') {
-      this.transformDataInWorker(data);
-    } else {
-      // Fallback to main thread
+      // Transform backend data to dashboard format
       const dashboardData = this.transformToDashboardData(data);
       this.dashboardData.set(dashboardData);
-      this.initializeFilters(dashboardData);
-    }
+
+      // Initialize Dashboard Filters
+      const dashDefaults = this.buildDefaults(dashboardData.filterConfig);
+      this.filters.set(dashDefaults);
+      this.draft.set(this.cloneState(dashDefaults));
+
+      // Initialize Data Filters
+      const dataDefaults = this.buildDefaults(this.dataFilterConfig());
+      this.dataFilters.set(dataDefaults);
+      this.dataDraft.set(this.cloneState(dataDefaults));
+    });
   }
 
   private loadCustodians(): void {
@@ -330,103 +299,7 @@ export class AumDataService {
     });
   }
 
-  private initializeFilters(dashboardData: AumDashboardData): void {
-    // Initialize Dashboard Filters
-    const dashDefaults = this.buildDefaults(dashboardData.filterConfig);
-    this.filters.set(dashDefaults);
-    this.draft.set(this.cloneState(dashDefaults));
-
-    // Initialize Data Filters
-    const dataDefaults = this.buildDefaults(this.dataFilterConfig());
-    this.dataFilters.set(dataDefaults);
-    this.dataDraft.set(this.cloneState(dataDefaults));
-  }
-
-  private transformDataInWorker(data: BackendDataResponse[]): void {
-    // Create worker code as a blob
-    const workerCode = `
-      self.onmessage = function(e) {
-        const data = e.data;
-        // Same transformation logic as transformToDashboardData
-        const groupedData = new Map();
-        
-        data.forEach(item => {
-          const advisor = item.advisor;
-          const provider = item.dataProvider;
-          const marketValue = item.marketValue || 0;
-
-          if (!groupedData.has(advisor)) {
-            groupedData.set(advisor, new Map());
-          }
-
-          const advisorMap = groupedData.get(advisor);
-          if (!advisorMap.has(provider)) {
-            advisorMap.set(provider, { aua: 0, addepar: 0, blackdiamond: 0 });
-          }
-
-          const summary = advisorMap.get(provider);
-          if (item.platform?.toLowerCase() === 'addepar') {
-            summary.addepar += marketValue;
-          } else if (item.platform?.toLowerCase().includes('black diamond')) {
-            summary.blackdiamond += marketValue;
-          }
-        });
-
-        const rows = [];
-        groupedData.forEach((providerMap, advisor) => {
-          providerMap.forEach((summary, provider) => {
-            rows.push({
-              advisor,
-              provider,
-              aua: summary.aua,
-              addepar: summary.addepar,
-              blackdiamond: summary.blackdiamond
-            });
-          });
-        });
-
-        const uniqueAdvisors = Array.from(new Set(data.map(item => item.advisor))).sort();
-        const uniqueProviders = Array.from(new Set(data.map(item => item.dataProvider))).sort();
-
-        const result = {
-          reportDate: new Date().toISOString().split('T')[0],
-          asOfLabel: 'As of ' + new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
-          kpiMeta: { totalAumTrend: '+0%', newAccounts: 0 },
-          filterConfig: [
-            { key: 'reportDate', label: 'Report Date', type: 'date', icon: 'calendar_today', defaultValue: new Date().toISOString().split('T')[0], span: 'full', matchable: false },
-            { key: 'advisor', label: 'Advisor', type: 'multiselect', icon: 'person', options: uniqueAdvisors, defaultValue: [], matchable: true },
-            { key: 'provider', label: 'Data Provider', type: 'multiselect', icon: 'storage', options: uniqueProviders, defaultValue: [], matchable: true },
-            { key: 'addeparRange', label: 'Addepar AUM Range ($)', type: 'range', icon: 'pie_chart', defaultValue: { min: '', max: '' }, matchable: true },
-            { key: 'bdRange', label: 'Black Diamond Range ($)', type: 'range', icon: 'diamond', defaultValue: { min: '', max: '' }, matchable: true },
-            { key: 'platformView', label: 'Platform View', type: 'multiselect', icon: 'visibility', options: ['Addepar', 'Black Diamond'], defaultValue: [], matchable: true }
-          ],
-          rows
-        };
-        
-        self.postMessage(result);
-      };
-    `;
-
-    const blob = new Blob([workerCode], { type: 'application/javascript' });
-    const worker = new Worker(URL.createObjectURL(blob));
-
-    worker.onmessage = (e) => {
-      this.dashboardData.set(e.data);
-      this.initializeFilters(e.data);
-      worker.terminate();
-    };
-
-    worker.onerror = (err) => {
-      console.error('Worker error:', err);
-      // Fallback to main thread
-      const dashboardData = this.transformToDashboardData(data);
-      this.dashboardData.set(dashboardData);
-      this.initializeFilters(dashboardData);
-      worker.terminate();
-    };
-
-    worker.postMessage(data);
-  }
+  private transformToDashboardData(data: BackendDataResponse[]): AumDashboardData {
     // Group data by advisor and data provider to calculate summary rows
     const groupedData = new Map<string, Map<string, { aua: number; addepar: number; blackdiamond: number }>>();
 

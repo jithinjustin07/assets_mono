@@ -53,7 +53,7 @@
         </tr>
         }
 
-        @for (group of (shouldShowVirtualScroll ? visibleGroups : svc.advisorGroups()); track group.advisor; trackByAdvisor) {
+        @for (group of svc.advisorGroups(); track group.advisor) {
         <!-- Collapsed header -->
         @if (group.collapsed) {
         <tr class="bg-slate-50">
@@ -85,7 +85,7 @@
           <td colspan="5"></td>
         </tr>
         <!-- Detail rows -->
-        @for (row of group.rows; track row.provider; trackByProvider) {
+        @for (row of group.rows; track row.provider) {
         <tr class="group">
           <td class="px-6 py-1 text-sm text-slate-500 pl-12 border-r border-slate-100 bg-white"></td>
           <td class="px-6 py-1 text-sm text-slate-600 font-medium">
@@ -127,13 +127,7 @@
         }
         }
 
-        @if (shouldShowVirtualScroll && svc.advisorGroups().length > VIRTUAL_SCROLL_THRESHOLD) {
-        <tr class="bg-blue-50 border-t-2 border-blue-200">
-          <td colspan="6" class="px-6 py-4 text-center text-sm text-blue-600 font-medium">
-            Showing {{ visibleGroups.length }} of {{ svc.advisorGroups().length }} advisors. Load more...
-          </td>
-        </tr>
-        }
+        <!-- Grand Total -->
         @if (svc.advisorGroups().length > 0) {
         <tr class="bg-white border-t-4 border-[#003366]">
           <td class="px-6 py-1 text-lg font-bold text-[#003366] font-serif">Grand Total</td>
