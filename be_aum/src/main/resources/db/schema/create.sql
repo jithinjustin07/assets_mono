@@ -136,6 +136,37 @@ CREATE TABLE IF NOT EXISTS holding (
     long_term_unrealized_gain DECIMAL(19,4)
 );
 
+CREATE TABLE IF NOT EXISTS public.household_entity (
+    -- Primary key (using SERIAL)
+    id SERIAL NOT NULL,
+
+    -- Base entity fields
+    created_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    created_by BIGINT,
+
+    -- BaseUpdatableEntity fields
+    updated_timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+
+    -- WfHouseholdEntity specific fields
+    name VARCHAR(255) NOT NULL,
+    relationship_id BIGINT,
+
+    -- Constraints
+    CONSTRAINT household_entity_pkey PRIMARY KEY (id),
+    CONSTRAINT fk_household_entity_relationship FOREIGN KEY (relationship_id)
+        REFERENCES public.relationship (id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
+);
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_household_entity_relationship_id
+    ON public.household_entity(relationship_id);
+
+CREATE INDEX IF NOT EXISTS idx_household_entity_name
+    ON public.household_entity(name);
+
 -- ==========================================
 -- Foreign Keys
 -- ==========================================
@@ -175,6 +206,23 @@ FOREIGN KEY (vendor_id) REFERENCES vendor(id);
 ALTER TABLE holding
 ADD CONSTRAINT fk_holding_account
 FOREIGN KEY (account_id) REFERENCES account(id);
+
+INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
+SELECT 'Patwa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'Patwa');
+
+INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
+SELECT 'India', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'India');
+
+INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
+SELECT 'Avestar', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'Avestar');
+
+INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
+SELECT 'Not Assigned', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'Not Assigned');
+
 
 -- ==========================================
 -- Indexes (for performance)

@@ -22,14 +22,14 @@ public class Custodian implements Serializable {
     //--- PRIMARY KEY
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="id", nullable=false)
+    @Column(name="id")
     private int        id ;
 
     //--- OTHER DATA FIELDS
-    @Column(name="created_timestamp", nullable=false)
+    @Column(name="created_timestamp")
     private LocalDateTime   createdTimestamp ;
 
-    @Column(name="updated_timestamp", nullable=false)
+    @Column(name="updated_timestamp")
     private LocalDateTime   updatedTimestamp ;
 
     @Column(name="created_by")
@@ -38,7 +38,7 @@ public class Custodian implements Serializable {
     @Column(name="updated_by")
     private Integer         updatedBy ;
 
-    @Column(name="name", nullable=false, length=2147483647)
+    @Column(name="name", length=2147483647)
     private String          name ;
 
     /**

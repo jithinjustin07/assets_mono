@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name="account", schema="public" )
@@ -17,14 +18,14 @@ public class Account implements Serializable {
     //--- PRIMARY KEY
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="id", nullable=false)
+    @Column(name="id")
     private int        id ;
 
     //--- OTHER DATA FIELDS
-    @Column(name="created_timestamp", nullable=false)
+    @Column(name="created_timestamp")
     private LocalDateTime   createdTimestamp ;
 
-    @Column(name="updated_timestamp", nullable=false)
+    @Column(name="updated_timestamp")
     private LocalDateTime   updatedTimestamp ;
 
     @Column(name="created_by")
@@ -33,13 +34,13 @@ public class Account implements Serializable {
     @Column(name="updated_by")
     private Integer         updatedBy ;
 
-    @Column(name="name", nullable=false, length=2147483647)
+    @Column(name="name", length=2147483647)
     private String          name ;
 
-    @Column(name="number", nullable=false, length=2147483647)
+    @Column(name="number", length=2147483647)
     private String          number ;
 
-    @Column(name="asset", nullable=false)
+    @Column(name="asset")
     private boolean         asset ;
 
     @Column(name="tax_status", length=2147483647)
@@ -48,19 +49,19 @@ public class Account implements Serializable {
     @Column(name="custodian_id")
     private Integer         custodianId ;
 
-    @Column(name="relationship_id", nullable=false)
-    private int             relationshipId ;
+    @Column(name="relationship_id")
+    private Integer         relationshipId ;
 
-    @Column(name="aum", nullable=false)
+    @Column(name="aum")
     private boolean         aum ;
 
-    @Column(name="managed", nullable=false)
+    @Column(name="managed")
     private boolean         managed ;
 
     @Column(name="account_benchmark_id")
     private Integer         accountBenchmarkId ;
 
-    @Column(name="as_of_date", nullable=false)
+    @Column(name="as_of_date")
     private LocalDateTime   asOfDate ;
 
     @Column(name="reporting_target", length=2147483647)
@@ -69,14 +70,14 @@ public class Account implements Serializable {
     @Column(name="goal", length=2147483647)
     private String          goal ;
 
-    @Column(name="custodial", nullable=false)
+    @Column(name="custodial")
     private boolean         custodial ;
 
     @Column(name="entity_id")
     private Integer         entityId ;
 
-    @Column(name="vendor_id", nullable=false)
-    private int             vendorId ;
+    @Column(name="vendor_id")
+    private Integer         vendorId ;
 
     @Column(name="type_id")
     private Integer         typeId ;

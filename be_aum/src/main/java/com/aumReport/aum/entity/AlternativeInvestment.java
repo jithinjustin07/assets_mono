@@ -12,22 +12,22 @@ public class AlternativeInvestment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     private Integer id;
 
 
     @ManyToOne
-    @JoinColumn(name = "account_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "account_id", referencedColumnName = "id")
     private Account account;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "alternative_investment_type", nullable = false, length = 50)
+    @Column(name = "alternative_investment_type", length = 50)
     private AlternativeInvestmentType alternativeInvestmentType;
 
-    @Column(name = "created_timestamp", nullable = false)
+    @Column(name = "created_timestamp")
     private LocalDateTime createdTimestamp;
 
-    @Column(name = "updated_timestamp", nullable = false)
+    @Column(name = "updated_timestamp")
     private LocalDateTime updatedTimestamp;
 
     @Column(name = "created_by")

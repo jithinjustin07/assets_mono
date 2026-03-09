@@ -22,14 +22,14 @@ public class Holding implements Serializable {
     //--- PRIMARY KEY
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="id", nullable=false)
+    @Column(name="id")
     private int        id ;
 
     //--- OTHER DATA FIELDS
-    @Column(name="created_timestamp", nullable=false)
+    @Column(name="created_timestamp")
     private LocalDateTime   createdTimestamp ;
 
-    @Column(name="updated_timestamp", nullable=false)
+    @Column(name="updated_timestamp")
     private LocalDateTime   updatedTimestamp ;
 
     @Column(name="created_by")
@@ -38,35 +38,36 @@ public class Holding implements Serializable {
     @Column(name="updated_by")
     private Integer         updatedBy ;
 
-    @Column(name="account_id", nullable=false)
+    @Column(name="account_id")
     private int             accountId ;
 
     @Column(name="product_id")
     private Integer         productId ;
 
-    @Column(name="asset_id", nullable=false)
+    @Column(name="asset_id")
     private int             assetId ;
 
     @Column(name="asset_product_mapping_id")
     private Integer         assetProductMappingId ;
 
-    @Column(name="value", nullable=false)
+    @Column(name="value")
     private double          value ;
 
-    @Column(name="cost_basis", nullable=false)
+    @Column(name="cost_basis")
     private double          costBasis ;
 
-    @Column(name="short_term_realized_gain", nullable=false)
+    @Column(name="short_term_realized_gain")
     private double          shortTermRealizedGain ;
 
-    @Column(name="short_term_unrealized_gain", nullable=false)
+    @Column(name="short_term_unrealized_gain")
     private double          shortTermUnrealizedGain ;
 
-    @Column(name="long_term_realized_gain", nullable=false)
+    @Column(name="long_term_realized_gain")
     private double          longTermRealizedGain ;
 
-    @Column(name="long_term_unrealized_gain", nullable=false)
+    @Column(name="long_term_unrealized_gain")
     private double          longTermUnrealizedGain ;
+
 
     /**
      * Constructor

@@ -19,14 +19,14 @@ public class UserProfile implements Serializable {
     //--- PRIMARY KEY
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column(name="id", nullable=false)
+    @Column(name="id")
     private int        id ;
 
     //--- OTHER DATA FIELDS
-    @Column(name="created_timestamp", nullable=false)
+    @Column(name="created_timestamp")
     private LocalDateTime   createdTimestamp ;
 
-    @Column(name="updated_timestamp", nullable=false)
+    @Column(name="updated_timestamp")
     private LocalDateTime   updatedTimestamp ;
 
     @Column(name="created_by")
@@ -35,22 +35,22 @@ public class UserProfile implements Serializable {
     @Column(name="updated_by")
     private Integer         updatedBy ;
 
-    @Column(name="name", nullable=false, length=2147483647)
+    @Column(name="name", length=2147483647)
     private String          name ;
 
-    @Column(name="password", nullable=false, length=2147483647)
+    @Column(name="password", length=2147483647)
     private String          password ;
 
-    @Column(name="mfa", nullable=false)
+    @Column(name="mfa")
     private boolean         mfa ;
 
-    @Column(name="password_change", nullable=false)
+    @Column(name="password_change")
     private boolean         passwordChange ;
 
-    @Column(name="active", nullable=false)
+    @Column(name="active")
     private boolean         active ;
 
-    @Column(name="email", nullable=false, length=2147483647)
+    @Column(name="email", length=2147483647)
     private String          email ;
 
     @Column(name="mobile", length=2147483647)
