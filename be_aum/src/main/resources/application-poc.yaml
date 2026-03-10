@@ -1,9 +1,9 @@
 ## Postgres DB connection properties
 spring:
  datasource:
-  url: jdbc:postgresql://localhost:5432/aum
-  username: postgres
-  password: root
+  url: jdbc:postgresql://avs-qa-db.cyawwhid1s6w.us-east-1.rds.amazonaws.com/aum
+  username: avsqa
+  password: NqyXb7jqj9Ub7EiGF
 
 server:
  port: 8080
@@ -17,4 +17,3 @@ auth:
    # Format: https://cognito-idp.{region}.amazonaws.com/{userPoolId}
    # The value must match the `iss` claim in the JWT exactly.
    - "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_LY7jo7QDt"
-   - "https://cognito-idp.us-east-1.amazonaws.com/us-east-1_YourProdPoolId"

@@ -1,25 +1,29 @@
-<div class="app-scale bg-[#F8F9FA] text-slate-800 min-h-screen flex flex-col">
-  <app-navbar />
-  <app-upload-modal />
+@if (isAuthenticated()) {
+  <div class="app-scale bg-[#F8F9FA] text-slate-800 min-h-screen flex flex-col">
+    <app-navbar />
+    <app-upload-modal />
 
-  <!-- Main: full-width, vertical layout. Content row below header contains aside (filter) and section (table/content) -->
-  <main class="flex-1 pt-4 pb-10 px-0 w-full flex flex-col">
-    <app-dashboard-header />
+    <!-- Main: full-width, vertical layout. Content row below header contains aside (filter) and section (table/content) -->
+    <main class="flex-1 pt-4 pb-10 px-0 w-full flex flex-col">
+      <app-dashboard-header />
 
-    <!-- Place active chips & kpi above the two-column content so filter aligns with table only -->
-    <app-active-chips />
-    <!-- <app-kpi-cards /> -->
+      <!-- Place active chips & kpi above the two-column content so filter aligns with table only -->
+      <app-active-chips />
+      <!-- <app-kpi-cards /> -->
 
-    <div class="content-row flex w-full">
-      <!-- Aside at extreme left with 1px left margin from viewport -->
-      <aside class="filter-aside">
-        <app-filter-modal></app-filter-modal>
-      </aside>
+      <div class="content-row flex w-full">
+        <!-- Aside at extreme left with 1px left margin from viewport -->
+        <aside class="filter-aside">
+          <app-filter-modal></app-filter-modal>
+        </aside>
 
-      <!-- Table/content section takes remaining width -->
-      <section class="flex-1">
-        <app-data-table />
-      </section>
-    </div>
-  </main>
-</div>
+        <!-- Table/content section takes remaining width -->
+        <section class="flex-1">
+          <app-data-table />
+        </section>
+      </div>
+    </main>
+  </div>
+} @else {
+  <router-outlet />
+}

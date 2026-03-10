@@ -13,6 +13,7 @@ import {
   Advisor,
 } from '../models/aum.models';
 import * as XLSX from 'xlsx';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AumDataService {
@@ -268,7 +269,8 @@ export class AumDataService {
   }
 
   private loadBackendData(): void {
-    this.http.get<BackendDataResponse[]>('/api/aum/data').subscribe(data => {
+   const url = `${environment.api.baseUrl}/api/aum/data`;
+    this.http.get<BackendDataResponse[]>(url).subscribe(data => {
       this.backendData.set(data);
 
       // Transform backend data to dashboard format
@@ -288,13 +290,15 @@ export class AumDataService {
   }
 
   private loadCustodians(): void {
-    this.http.get<Custodian[]>('/api/custodians').subscribe(data => {
+     const url = `${environment.api.baseUrl}/api/custodians`;
+    this.http.get<Custodian[]>(url).subscribe(data => {
       this.custodians.set(data);
     });
   }
 
   private loadAdvisors(): void {
-    this.http.get<Advisor[]>('/api/advisors').subscribe(data => {
+     const url = `${environment.api.baseUrl}/api/advisors`;
+    this.http.get<Advisor[]>(url).subscribe(data => {
       this.advisors.set(data);
     });
   }
