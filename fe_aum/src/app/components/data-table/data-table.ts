@@ -19,6 +19,7 @@ export class DataTable {
   onToggle(advisor: string): void { this.svc.toggleAdvisor(advisor); }
 
   get rowsInfo(): string {
+    if (this.svc.loading()) return 'Loading...';
     const groups = this.svc.advisorGroups();
     const filtered = this.svc.filteredRows();
     if (!groups.length) return 'No results';

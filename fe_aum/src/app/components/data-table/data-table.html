@@ -45,7 +45,16 @@
       </thead>
       <tbody class="bg-white divide-y divide-slate-200">
 
-        @if (svc.advisorGroups().length === 0) {
+        @if (svc.loading()) {
+        <tr>
+          <td colspan="5" class="px-6 py-12 text-center">
+            <div class="loading-container">
+              <div class="loading-spinner"></div>
+              <p class="loading-text">Loading data...</p>
+            </div>
+          </td>
+        </tr>
+        } @else if (svc.advisorGroups().length === 0) {
         <tr>
           <td colspan="5" class="px-6 py-12 text-center text-sm text-slate-400 italic">
             No results match your filters.
@@ -178,27 +187,38 @@
       <thead class="bg-[rgba(0,0,0,1)] text-white">
         <tr>
           @for (col of svc.dataColumns(); track col) {
-            @if (svc.isColumnVisible(col)) {
-              <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">{{ col }}</th>
-            }
+          @if (svc.isColumnVisible(col)) {
+          <th class="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">{{ col }}</th>
+          }
           }
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-slate-200">
-        @if (svc.detailedRows().length === 0) {
+        @if (svc.loading()) {
         <tr>
-          <td [attr.colspan]="svc.visibleDataColumns().size" class="px-6 py-12 text-center text-sm text-slate-400 italic">No detailed rows available.</td>
+          <td [attr.colspan]="svc.visibleDataColumns().size" class="px-6 py-12 text-center">
+            <div class="loading-container">
+              <div class="loading-spinner"></div>
+              <p class="loading-text">Loading data...</p>
+            </div>
+          </td>
+        </tr>
+        } @else if (svc.detailedRows().length === 0) {
+        <tr>
+          <td [attr.colspan]="svc.visibleDataColumns().size"
+            class="px-6 py-12 text-center text-sm text-slate-400 italic">No detailed rows available.</td>
         </tr>
         }
 
         @for (row of svc.detailedRows(); track row["Account Number"]) {
         <tr>
           @for (col of svc.dataColumns(); track col) {
-            @if (svc.isColumnVisible(col)) {
-              <td class="px-4 py-1 text-sm text-slate-700" [class.font-mono]="col === 'Account Number'" [class.text-right]="col === 'Market Value' || col === 'AUA'">
-                {{ row[col] }}
-              </td>
-            }
+          @if (svc.isColumnVisible(col)) {
+          <td class="px-4 py-1 text-sm text-slate-700" [class.font-mono]="col === 'Account Number'"
+            [class.text-right]="col === 'Market Value' || col === 'AUA'">
+            {{ row[col] }}
+          </td>
+          }
           }
         </tr>
         }

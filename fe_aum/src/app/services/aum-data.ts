@@ -22,6 +22,7 @@ export class AumDataService {
   readonly backendData = signal<BackendDataResponse[]>([]);
   readonly custodians = signal<Custodian[]>([]);
   readonly advisors = signal<Advisor[]>([]);
+  readonly loading = signal<boolean>(true);
 
   // ── Filter & sort state ─────────────────────────────────────────────────
   readonly sortCol = signal<string | null>(null);
@@ -281,6 +282,7 @@ export class AumDataService {
       }
     }
 
+    this.loading.set(true);
     this.http.get<BackendDataResponse[]>(url).subscribe(data => {
       this.backendData.set(data);
 
@@ -297,6 +299,8 @@ export class AumDataService {
       const dataDefaults = this.buildDefaults(this.dataFilterConfig());
       this.dataFilters.set(dataDefaults);
       this.dataDraft.set(this.cloneState(dataDefaults));
+
+      this.loading.set(false);
     });
   }
 
