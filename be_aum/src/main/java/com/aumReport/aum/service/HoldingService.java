@@ -26,4 +26,6 @@ public interface HoldingService {
     List<Holding> getHoldingsByAccountIds(List<Integer> accountIds);
     
     Double getTotalValueByAccountId(int accountId);
+
+    public Map<Integer, Double> getTotalValuesByAccountIds(List<Long> accountIds);
 }

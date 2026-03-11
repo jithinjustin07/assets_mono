@@ -5,6 +5,7 @@ import com.aumReport.aum.repo.HoldingRepository;
 import com.aumReport.aum.service.HoldingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
 import java.util.Map;
@@ -63,9 +64,21 @@ public class HoldingServiceImpl implements HoldingService {
     public List<Holding> getHoldingsByAccountIds(List<Integer> accountIds) {
         return holdingRepository.findByAccountIds(accountIds);
     }
-    
+
     @Override
     public Double getTotalValueByAccountId(int accountId) {
-        return holdingRepository.getTotalValueByAccountId(accountId);
+        return 0.0;
+    }
+
+    @Override
+    @Cacheable(value = "accountMarketValue", key = "#accountIds")
+    public Map<Integer, Double> getTotalValuesByAccountIds(List<Long> accountIds) {
+        List<Object[]> results = holdingRepository.getTotalValuesByAccountIds(accountIds);
+
+        return results.stream()
+                .collect(Collectors.toMap(
+                        row -> (Integer) row[0],
+                        row -> (Double) row[1]
+                ));
     }
 }

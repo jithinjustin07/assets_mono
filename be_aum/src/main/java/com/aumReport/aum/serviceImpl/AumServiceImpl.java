@@ -43,6 +43,11 @@ public class AumServiceImpl implements AumService {
 
     @Override
     public List<DataResponse> getData() {
+        return getData(null);
+    }
+
+    @Override
+    public List<DataResponse> getData(Boolean aum) {
         List<DataResponse> dataResponses = new ArrayList<>();
         dataResponses.addAll(getBlackDiamondData());
         dataResponses.addAll(getAddeparData());
@@ -51,7 +56,12 @@ public class AumServiceImpl implements AumService {
                         account.accountName == null ||  account.accountName.trim().isEmpty()
         );
 
-        dataResponses.parallelStream().forEach(response -> {
+        // Filter by AUM status if parameter is provided
+        if (aum != null) {
+            dataResponses = dataResponses.parallelStream().filter(dr -> dr.getAum() == aum).toList();
+        }
+
+        dataResponses.forEach(response -> {
             // Change custodian "manual account" to "manual"
             if ("manual account".equalsIgnoreCase(response.getDataProvider())) {
                 response.setDataProvider("manual");
@@ -65,7 +75,8 @@ public class AumServiceImpl implements AumService {
             // If relationship name contains "family office", set advisor to "FOS"
             if (response.getRelationshipName() != null && 
                 response.getRelationshipName().toLowerCase().contains("family office")) {
-                response.setAdvisor("FOS");
+                response.setAdvisor("Avestar");
+                response.setDataProvider("FOS");
             }
             if(response.getAccountName().contains("MAHADEVIA")){
                 response.setAum(true);
@@ -219,8 +230,11 @@ public class AumServiceImpl implements AumService {
                     response.setDataProvider(names != null ? names.get("custodian") : null);
                     
                     response.setIsSupervised(account.isManaged());
-                    
-                    Double totalValue = holdingService.getTotalValueByAccountId(account.getId());
+
+                    Map<Integer, Double> marketValueMap =
+                            holdingService.getTotalValuesByAccountIds(accountIds);
+
+                    Double totalValue = marketValueMap.get(account.getId());
                     response.setMarketValue(totalValue != null ? totalValue : 0.0);
                     
                     response.setAum(account.isAum());
@@ -315,10 +329,13 @@ public class AumServiceImpl implements AumService {
                         response.setDataProvider(names != null ? names.get("custodian") : null);
                         
                         response.setIsSupervised(account.isManaged());
-                        
-                        Double totalValue = holdingService.getTotalValueByAccountId(account.getId());
+
+                        Map<Integer, Double> marketValueMap =
+                                holdingService.getTotalValuesByAccountIds(accountIds);
+
+                        Double totalValue = marketValueMap.get(account.getId());
                         response.setMarketValue(totalValue != null ? totalValue : 0.0);
-                        
+
                         response.setAum(account.isAum());
                         
                         if(account.getAlternativeInvestmentType()!=null && account.getAlternativeInvestmentType().contains("External")){

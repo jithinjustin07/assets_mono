@@ -9,5 +9,6 @@ import java.util.List;
 public interface AumService {
 
     List<DataResponse> getData();
+    List<DataResponse> getData(Boolean aum);
     String uploadData(String data);
 }

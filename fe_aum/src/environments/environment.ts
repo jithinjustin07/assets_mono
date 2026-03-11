@@ -4,7 +4,7 @@ export const environment = {
   // API Configuration
   api: {
     // Base URL for your backend API - Production
-    baseUrl: 'https://poc.avestarone.com/api/aum',
+    baseUrl: 'http://localhost:8080',
 
     // API Endpoints
     endpoints: {

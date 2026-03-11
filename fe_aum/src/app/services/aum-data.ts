@@ -269,7 +269,18 @@ export class AumDataService {
   }
 
   private loadBackendData(): void {
-   const url = `${environment.api.baseUrl}/api/aum/data`;
+    // Get AUM filter state to determine API call
+    const aumFilter = this.filters()['aumFilter'] as Set<string>;
+    let url = `${environment.api.baseUrl}/api/aum/data`;
+
+    if (aumFilter && aumFilter.size > 0) {
+      if (aumFilter.has('Yes')) {
+        url += '?aum=true';
+      } else if (aumFilter.has('No')) {
+        url += '?aum=false';
+      }
+    }
+
     this.http.get<BackendDataResponse[]>(url).subscribe(data => {
       this.backendData.set(data);
 
@@ -349,9 +360,10 @@ export class AumDataService {
       });
     });
 
-    // Get unique values for filter options
-    const uniqueAdvisors = Array.from(new Set(data.map(item => item.advisor))).sort();
-    const uniqueProviders = Array.from(new Set(data.map(item => item.dataProvider))).sort();
+    // Get unique values for filter options from all backend data
+    const allData = this.backendData();
+    const uniqueAdvisors = Array.from(new Set(allData.map(item => item.advisor))).sort();
+    const uniqueProviders = Array.from(new Set(allData.map(item => item.dataProvider))).sort();
 
     return {
       reportDate: new Date().toISOString().split('T')[0],
@@ -412,6 +424,15 @@ export class AumDataService {
           options: ["Addepar", "Black Diamond"],
           defaultValue: [],
           matchable: true
+        },
+        {
+          key: "aumFilter",
+          label: "AUM",
+          type: "multiselect",
+          icon: "check_circle",
+          options: ["Yes", "No"],
+          defaultValue: [],
+          matchable: true
         }
       ],
       rows
@@ -435,6 +456,8 @@ export class AumDataService {
       this.dataFilters.set(this.cloneState(this.dataDraft()));
     } else {
       this.filters.set(this.cloneState(this.draft()));
+      // Reload backend data when AUM filter changes in dashboard mode
+      this.loadBackendData();
     }
   }
 

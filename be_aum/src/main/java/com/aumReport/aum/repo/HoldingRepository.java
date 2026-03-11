@@ -21,7 +21,7 @@ public interface HoldingRepository extends JpaRepository<Holding, Integer> {
     List<Holding> findByAccountIds(@Param("accountIds") List<Integer> accountIds);
     
     @Query("SELECT h.accountId, SUM(h.value) FROM Holding h WHERE h.accountId IN :accountIds GROUP BY h.accountId")
-    List<Object[]> getTotalValuesByAccountIds(@Param("accountIds") List<Integer> accountIds);
+    List<Object[]> getTotalValuesByAccountIds(@Param("accountIds") List<Long> accountIds);
     
     @Query("SELECT SUM(h.value) FROM Holding h WHERE h.accountId = :accountId")
     Double getTotalValueByAccountId(@Param("accountId") int accountId);
