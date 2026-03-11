@@ -2,11 +2,10 @@ package com.aumReport.aum.serviceImpl;
 
 import com.aumReport.aum.dto.DataResponse;
 import com.aumReport.aum.entity.Account;
-import com.aumReport.aum.entity.Advisor;
 import com.aumReport.aum.entity.Vendor;
 import com.aumReport.aum.enums.AdvisorType;
-import com.aumReport.aum.enums.CustodianType;
 import com.aumReport.aum.enums.VendorType;
+import com.aumReport.aum.repo.AccountRepository;
 import com.aumReport.aum.service.AccountService;
 import com.aumReport.aum.service.AdvisorService;
 import com.aumReport.aum.service.AumService;
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,22 +38,27 @@ public class AumServiceImpl implements AumService {
     
     @Autowired
     AccountDataHelper accountDataHelper;
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Override
     public List<DataResponse> getData() {
         List<DataResponse> dataResponses = new ArrayList<>();
         dataResponses.addAll(getBlackDiamondData());
         dataResponses.addAll(getAddeparData());
-        
-        // Post-processing: Update custodian and advisor information
-        for (DataResponse response : dataResponses) {
+        dataResponses.removeIf(account ->
+                account.accountNumber == null || account.accountNumber.trim().isEmpty() ||
+                        account.accountName == null ||  account.accountName.trim().isEmpty()
+        );
+
+        dataResponses.parallelStream().forEach(response -> {
             // Change custodian "manual account" to "manual"
             if ("manual account".equalsIgnoreCase(response.getDataProvider())) {
                 response.setDataProvider("manual");
             }
             
             // If advisor is blank, fill with "avestar"
-            if (response.getAdvisor() == null || response.getAdvisor().trim().isEmpty()) {
+            if (response.getAdvisor() == null || response.getAdvisor().trim().isEmpty() || response.getAdvisor().equalsIgnoreCase("No Advisor Value Assigned")) {
                 response.setAdvisor(AdvisorType.AVESTAR.getValue());
             }
             
@@ -64,8 +67,15 @@ public class AumServiceImpl implements AumService {
                 response.getRelationshipName().toLowerCase().contains("family office")) {
                 response.setAdvisor("FOS");
             }
-
-        }
+            if(response.getAccountName().contains("MAHADEVIA")){
+                response.setAum(true);
+                response.setAua(null);
+                response.setDataProvider("External Investment");
+            }
+            if(response.getDataProvider().equalsIgnoreCase("Alternative Investment") ){
+                response.setDataProvider("manual");
+            }
+        });
         
         return dataResponses;
     }
@@ -185,15 +195,8 @@ public class AumServiceImpl implements AumService {
             }
         }
 
-        // Task 5: Set default advisor to "avestar" if advisor is blank
-        for (Account account : filteredAccounts) {
-            if (account.getAdvisor() == null || account.getAdvisor().trim().isEmpty()) {
-                account.setAdvisor(AdvisorType.AVESTAR.getValue());
-            }
-        }
+     //    Set advisor names and filter accounts
 
-        // Set advisor names and filter accounts
-        setAdvisor(filteredAccounts);
         
         // Set relationship data for accounts
         accountService.setRelationshipDataForAccounts(filteredAccounts);
@@ -221,7 +224,11 @@ public class AumServiceImpl implements AumService {
                     response.setMarketValue(totalValue != null ? totalValue : 0.0);
                     
                     response.setAum(account.isAum());
-                    response.setAdvisor(account.getAdvisor());
+                    if(account.getAlternativeInvestmentType()!=null && account.getAlternativeInvestmentType().contains("External")){
+                        response.setAua(true);
+                    }
+
+                    response.setAdvisor(account.getAdvisor() != null ? account.getAdvisor() : "Avestar");
                     response.setRelationshipManager(account.getRelationshipManager());
                     response.setRelationshipName(account.getRelationshipName());
                     response.setAsOfDate(account.getAsOfDate() != null ? account.getAsOfDate().toString() : null);
@@ -284,7 +291,7 @@ public class AumServiceImpl implements AumService {
                     .collect(Collectors.toList());
 
             // Set advisor names and filter accounts
-            setAdvisor(filteredAccounts);
+
             
             // Set relationship data for accounts
             accountService.setRelationshipDataForAccounts(filteredAccounts);
@@ -313,7 +320,12 @@ public class AumServiceImpl implements AumService {
                         response.setMarketValue(totalValue != null ? totalValue : 0.0);
                         
                         response.setAum(account.isAum());
-                        response.setAdvisor(account.getAdvisor());
+                        
+                        if(account.getAlternativeInvestmentType()!=null && account.getAlternativeInvestmentType().contains("External")){
+                        response.setAua(true);
+                        }
+
+                        response.setAdvisor(account.getAdvisor() != null ? account.getAdvisor() : "Avestar");
                         response.setRelationshipManager(account.getRelationshipManager());
                         response.setRelationshipName(account.getRelationshipName());
                         response.setAsOfDate(account.getAsOfDate() != null ? account.getAsOfDate().toString() : null);
@@ -326,46 +338,6 @@ public class AumServiceImpl implements AumService {
         return new ArrayList<>();
     }
 
-    void setAdvisor(List<Account> filteredAccounts ){
-        // Set advisor names for all accounts
-        accountService.setAdvisorNamesForAccounts(filteredAccounts);
+    
 
-        // Look up the "Not Assigned" advisor's DB id dynamically
-        Optional<Advisor> notAssignedAdvisor = advisorService.getAdvisorByName(AdvisorType.NOT_ASSIGNED.getValue());
-        if (notAssignedAdvisor.isEmpty()) {
-            throw new IllegalStateException(
-                    "Advisor '" + AdvisorType.NOT_ASSIGNED.getValue() + "' not found in the database.");
-        }
-        Optional<Advisor> avestar = advisorService.getAdvisorByName(AdvisorType.AVESTAR.getValue());
-        if (avestar.isEmpty()) {
-            throw new IllegalStateException(
-                    "Advisor '" + AdvisorType.AVESTAR.getValue() + "' not found in the database.");
-        }
-
-        int notAssignedAdvisorId = notAssignedAdvisor.get().getId();
-        int avestarAdvisorId = avestar.get().getId();
-
-        List<Integer> alternativeInvestmentCustodianIds = CustodianType.ALTERNATIVE_INVESTMENT.getIds();//change if db value increase
-
-        List<Long> accountsId = filteredAccounts.stream()
-                .map(account -> (long) account.getId())
-                .toList();
-
-        // Filter > "No Advisor" then filter Data Provider >Alternative Investments
-        List<Integer> acNotAssignedAndAlternativeInvestments = advisorService.reassignAdvisorForCustodians(
-                avestarAdvisorId,
-                notAssignedAdvisorId,
-                alternativeInvestmentCustodianIds, accountsId
-        );
-        
-        // Update advisor field for the affected accounts with "Avestar" name
-        String avestarName = AdvisorType.AVESTAR.getValue();
-        filteredAccounts.stream()
-                .filter(account -> acNotAssignedAndAlternativeInvestments.contains(account.getId()))
-                .forEach(account -> account.setAdvisor(avestarName));
-
-        // remove all the accounts in the filtered accounts having name as NOT_ASSIGNED("Not Assigned") from advisor type
-        String notAssignedName = AdvisorType.NOT_ASSIGNED.getValue();
-        filteredAccounts.removeIf(account -> notAssignedName.equals(account.getAdvisor()));
-    }
 }

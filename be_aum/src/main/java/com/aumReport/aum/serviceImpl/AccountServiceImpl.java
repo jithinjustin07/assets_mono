@@ -92,8 +92,11 @@ public class AccountServiceImpl implements AccountService {
         
         for (Account account : accounts) {
             Map<String, String> names = namesMap.get((long) account.getId());
-            if (names != null) {
+            if (names != null && names.get("advisor") != null) {
                 account.setAdvisor(names.get("advisor"));
+            }
+            if(names != null && names.get("advisor") == null){
+                account.setAdvisor("Avestar");
             }
         }
     }
@@ -139,5 +142,10 @@ public class AccountServiceImpl implements AccountService {
     public void setRelationshipDataForAccount(Account account) {
         account.setRelationshipName(relationshipDataHelper.getRelationshipName(account.getRelationshipId()));
         account.setRelationshipManager(relationshipDataHelper.getRelationshipManagerName(account.getRelationshipId()));
+    }
+    
+    @Override
+    public List<Account> getAccountsByNumber(String number) {
+        return accountRepository.findAllByNumber(number);
     }
 }

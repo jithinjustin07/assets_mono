@@ -17,6 +17,10 @@ public interface AccountRepository extends JpaRepository<Account, Long>, JpaSpec
     
     Optional<Account> findByNumber(String number);
     
+    List<Account> findAllByNumber(String number);
+    
+    List<Account> findByName(String name);
+    
     void deleteByNumber(String number);
     
     @Query(value = """

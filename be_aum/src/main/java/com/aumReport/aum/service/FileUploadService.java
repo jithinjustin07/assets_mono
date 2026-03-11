@@ -8,5 +8,15 @@ import java.io.IOException;
 public interface FileUploadService {
     
     void blackDiamondUpload(MultipartFile file) throws IOException;
-    
+
+    void addeparUpload(MultipartFile file) throws IOException;
+
+    void investmentTypeUpload(MultipartFile file) throws IOException;
+
+    void relationshipManager(MultipartFile file) throws IOException;
+
+    void addeparAdvisorUpdate(MultipartFile file) throws IOException;
+
+    void bdAdvisorUpdate(MultipartFile file) throws IOException;
+
 }

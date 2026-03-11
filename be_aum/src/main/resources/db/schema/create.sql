@@ -207,21 +207,21 @@ ALTER TABLE holding
 ADD CONSTRAINT fk_holding_account
 FOREIGN KEY (account_id) REFERENCES account(id);
 
-INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
-SELECT 'Patwa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'Patwa');
-
-INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
-SELECT 'India', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'India');
-
-INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
-SELECT 'Avestar', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'Avestar');
-
-INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
-SELECT 'Not Assigned', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
-WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'Not Assigned');
+--INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
+--SELECT 'Patwa', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+--WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'Patwa');
+--
+--INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
+--SELECT 'India', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+--WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'India');
+--
+--INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
+--SELECT 'Avestar', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+--WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'Avestar');
+--
+--INSERT INTO public.advisor (name, created_timestamp, updated_timestamp)
+--SELECT 'Not Assigned', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+--WHERE NOT EXISTS (SELECT 1 FROM public.advisor WHERE name = 'Not Assigned');
 
 
 -- ==========================================
@@ -257,3 +257,7 @@ ON holding(account_id);
 CREATE INDEX idx_holding_asset_id ON holding(asset_id);
 CREATE INDEX idx_account_number ON account(number);
 CREATE INDEX idx_relationship_name ON relationship(name);
+
+alter table account add column if not exists investment_type varchar(255);
+
+alter table account add column if not exists advisor varchar(255);

@@ -113,7 +113,7 @@ export class AumDataService {
       "As of Date": item.asOfDate ? new Date(item.asOfDate).toLocaleDateString('en-GB') : "",
       "Closed Date": item.closedDate ? new Date(item.closedDate).toLocaleDateString('en-GB') : "-",
       "Relationship Name": item.relationshipName,
-      "AUA": item.aua ? "Yes" : "",
+      "AUA": item.aua ? item.marketValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "",
       "Platform": item.platform
     }));
   });
@@ -322,7 +322,10 @@ export class AumDataService {
       }
 
       const summary = advisorMap.get(provider)!;
-      // AUA is null in backend, leave as 0 for now
+      // Calculate AUA from market value when aua is true
+      if (item.aua) {
+        summary.aua += marketValue;
+      }
 
       // Allocate to platforms based on the platform field
       if (item.platform?.toLowerCase() === 'addepar') {

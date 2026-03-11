@@ -33,4 +33,6 @@ public interface AccountService {
      Map<Long, Map<String, String>> getAdvisorAndCustodianNamesByAccountIds(List<Long> accountIds);
      
      void setRelationshipDataForAccounts(List<Account> accounts);
+    
+    List<Account> getAccountsByNumber(String number);
 }

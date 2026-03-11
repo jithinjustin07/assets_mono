@@ -6,8 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DataResponse {
-    private String accountNumber;
-    private String accountName;
+    public String accountNumber;
+    public String accountName;
     private String dataProvider;
     private Boolean isSupervised;
     private double marketValue;

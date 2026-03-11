@@ -22,23 +22,6 @@ public class AumController {
     @Autowired
     AumService aumService;
 
-
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadData(@RequestBody String request) {
-        try {
-            {
-//                "task":"Addepar Upload",
-//                    "filename":"Avestarone_Download_02-13-2026-Addepar(1).csv",
-//
-//                    "content":
-            }
-//            aumService.uploadData();
-            return new ResponseEntity<>("Data uploaded successfully", HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>("Failed to upload data: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @GetMapping("/data")
     public ResponseEntity<List<DataResponse>> getData() {
         List<DataResponse> data = aumService.getData();

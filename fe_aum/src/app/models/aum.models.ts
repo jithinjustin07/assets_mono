@@ -79,7 +79,7 @@ export interface Custodian {
   [key: string]: any;
 }
 
-// Advisor entity for filter options  
+// Advisor entity for filter options
 export interface Advisor {
   id: number;
   name: string;

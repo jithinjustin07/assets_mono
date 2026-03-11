@@ -85,7 +85,7 @@ public class Account implements Serializable {
     @Transient
     private Boolean isAua;
 
-    @Transient
+    @Column(name="advisor")
     private String advisor;
 
     @Transient
@@ -93,6 +93,9 @@ public class Account implements Serializable {
 
     @Transient
     private String relationshipManager;
+
+    @Column(name = "investment_type")
+    private String alternativeInvestmentType;
 
     /**
      * Constructor

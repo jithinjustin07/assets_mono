@@ -195,7 +195,7 @@
         <tr>
           @for (col of svc.dataColumns(); track col) {
             @if (svc.isColumnVisible(col)) {
-              <td class="px-4 py-1 text-sm text-slate-700" [class.font-mono]="col === 'Account Number'" [class.text-right]="col === 'Market Value'">
+              <td class="px-4 py-1 text-sm text-slate-700" [class.font-mono]="col === 'Account Number'" [class.text-right]="col === 'Market Value' || col === 'AUA'">
                 {{ row[col] }}
               </td>
             }

@@ -21,11 +21,37 @@ public class FileUploadController {
     @Autowired
     private FileUploadService service;
 
-
-
     @PostMapping("/bd")
     public ResponseEntity<String> blackDiamondUpload(@RequestParam("file") MultipartFile file) throws IOException {
         service.blackDiamondUpload(file);
         return ResponseEntity.ok("bd file uploaded successfully");
     }
+
+    @PostMapping("/addepar")
+    public ResponseEntity<String> addeparUpload(@RequestParam("file") MultipartFile file) throws IOException {
+        service.addeparUpload(file);
+        return ResponseEntity.ok("addepar file uploaded successfully");
+    }
+
+    @PostMapping("/investment/type")
+    public ResponseEntity<String> investmentType(@RequestParam("file") MultipartFile file) throws IOException {
+        service.investmentTypeUpload(file);
+        return ResponseEntity.ok("investment type file uploaded successfully");
+    }
+
+@PostMapping("/addeparadvisorupdate")
+    public ResponseEntity<String> addeparAdvisorUpdate(@RequestParam("file") MultipartFile file) throws IOException {
+        service.addeparAdvisorUpdate(file);
+        return ResponseEntity.ok("addepar advisor update file uploaded successfully");
+    }
+
+    @PostMapping("/bdadvisorupdate")
+    public ResponseEntity<String> bdAdvisorUpdate(@RequestParam("file") MultipartFile file) throws IOException {
+        service.bdAdvisorUpdate(file);
+        return ResponseEntity.ok("bd advisor update file uploaded successfully");
+    }
+
+
+
+
 }

@@ -1,14 +1,14 @@
 ## Postgres DB connection properties
 spring:
  datasource:
-  url: jdbc:postgresql://localhost:5432/aum
+  url: jdbc:postgresql://localhost:5432/aum_test
   username: postgres
   password: root
 
-server:
- port: 8080
- servlet:
-  context-path: /aum
+#server:
+# port: 8080
+# servlet:
+#  context-path: /aum
 
 auth:
  security:

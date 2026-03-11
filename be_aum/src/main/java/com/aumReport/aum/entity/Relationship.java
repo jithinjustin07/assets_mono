@@ -90,6 +90,9 @@ public class Relationship implements Serializable {
     @Column(name="target_id")
     private int             targetId ;
 
+    @Transient
+    private String   relationshipManager ;
+
     /**
      * Constructor
      */
