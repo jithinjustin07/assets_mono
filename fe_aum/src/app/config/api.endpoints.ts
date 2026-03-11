@@ -23,10 +23,10 @@ export class ApiEndpoints {
     return this.endpoints.aumReports;
   }
 
-  // Assets endpoints
-  static get assets() {
-    return this.endpoints.assets;
-  }
+//   // Assets endpoints
+//   static get assets() {
+//     return this.endpoints.assets;
+//   }
 
   // Users endpoints
   static get users() {
@@ -77,7 +77,7 @@ export class ApiEndpoints {
       auth: this.auth,
       custodians: this.custodians,
       aumReports: this.aumReports,
-      assets: this.assets,
+//       assets: this.assets,
       users: this.users,
       reports: this.reports,
       dashboard: this.dashboard,

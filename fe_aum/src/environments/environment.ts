@@ -1,10 +1,10 @@
 export const environment = {
-  production: false,
+  production: true,
 
   // API Configuration
   api: {
-    // Base URL for your backend API
-    baseUrl: 'http://localhost:8080',
+    // Base URL for your backend API - Production
+    baseUrl: 'https://poc.avestarone.com/api/aum',
 
     // API Endpoints
     endpoints: {
@@ -18,7 +18,7 @@ export const environment = {
 
       // Custodian endpoints
       custodians: {
-        list: '/custodians',
+        list: '/api/custodians',
         create: '/custodians',
         update: '/custodians/:id',
         delete: '/custodians/:id',
@@ -26,18 +26,27 @@ export const environment = {
       },
 
       // AUM Reports endpoints
-     aumReports: {
-               list: '/api/aum/data',
-               create: '/api/aum',
-               update: '/aum-reports/:id',
-               delete: '/aum-reports/:id',
-               export: '/aum-reports/export',
-               details: '/aum-reports/:id'
-             },
+      aumReports: {
+        list: '/aum-reports',
+        create: '/aum-reports',
+        update: '/aum-reports/:id',
+        delete: '/aum-reports/:id',
+        export: '/aum-reports/export',
+        details: '/aum-reports/:id'
+      },
 
-      // Assets endpoints
-      assets: {
-        list: '/assets',
+     aum: {
+            list: '/api/aum/data',
+            create: '/api/aum',
+            update: '/aum-reports/:id',
+            delete: '/aum-reports/:id',
+            export: '/aum-reports/export',
+            details: '/aum-reports/:id'
+          },
+
+      // vendors
+      vendors: {
+        list: '/api/vendors',
         create: '/assets',
         update: '/assets/:id',
         delete: '/assets/:id',
@@ -78,8 +87,8 @@ export const environment = {
       }
     },
 
-    // Request configuration
-    timeout: 30000, // 30 seconds
+    // Request configuration - Production timeout
+    timeout: 45000, // 45 seconds
 
     // Default headers
     defaultHeaders: {
