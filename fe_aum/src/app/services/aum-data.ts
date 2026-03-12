@@ -70,7 +70,7 @@ export class AumDataService {
   readonly allRows = computed<AumRow[]>(() => {
     const data = this.dashboardData();
     if (!data) return [];
-    return data.rows.map(r => ({ ...r, total: r.addepar + r.blackdiamond }));
+    return data.rows.map(r => ({ ...r, total: r.addepar + r.blackdiamond + r.aua }));
   });
 
   readonly filterConfig = computed<FilterConfig[]>(() => this.dashboardData()?.filterConfig ?? []);
@@ -227,6 +227,7 @@ export class AumDataService {
       totalAua: grpRows.reduce((s, r) => s + r.aua, 0),
       totalAuaAddepar: grpRows.reduce((s, r) => s + r.auaAddepar, 0),
       totalAuaBD: grpRows.reduce((s, r) => s + r.auaBD, 0),
+      totalAum: grpRows.reduce((s, r) => s + r.aum, 0),
       totalAddepar: grpRows.reduce((s, r) => s + r.addepar, 0),
       totalBD: grpRows.reduce((s, r) => s + r.blackdiamond, 0),
       grandTotal: grpRows.reduce((s, r) => s + (r.total ?? 0), 0),
@@ -258,13 +259,15 @@ export class AumDataService {
     const grandAuaBD = groups.reduce((s, g) => s + g.totalAuaBD, 0);
     const grandAddepar = groups.reduce((s, g) => s + g.totalAddepar, 0);
     const grandBD = groups.reduce((s, g) => s + g.totalBD, 0);
+    const grandAum = groups.reduce((s, g) => s + g.totalAum, 0);
     return {
       grandAua,
       grandAuaAddepar,
       grandAuaBD,
+      grandAum,
       grandAddepar,
       grandBD,
-      grandTotal: grandAddepar + grandBD,
+      grandTotal: grandAddepar + grandBD + grandAua,
       advisorCount: groups.length,
     };
   });
@@ -350,7 +353,7 @@ export class AumDataService {
 
   private transformToDashboardData(data: BackendDataResponse[]): AumDashboardData {
     // Group data by advisor and data provider to calculate summary rows
-    const groupedData = new Map<string, Map<string, { aua: number; auaAddepar: number; auaBD: number; addepar: number; blackdiamond: number }>>();
+    const groupedData = new Map<string, Map<string, { aua: number; auaAddepar: number; auaBD: number; aum: number; addepar: number; blackdiamond: number }>>();
 
     data.forEach(item => {
       const advisor = item.advisor;
@@ -363,7 +366,7 @@ export class AumDataService {
 
       const advisorMap = groupedData.get(advisor)!;
       if (!advisorMap.has(provider)) {
-        advisorMap.set(provider, { aua: 0, auaAddepar: 0, auaBD: 0, addepar: 0, blackdiamond: 0 });
+        advisorMap.set(provider, { aua: 0, auaAddepar: 0, auaBD: 0, aum: 0, addepar: 0, blackdiamond: 0 });
       }
 
       const summary = advisorMap.get(provider)!;
@@ -376,13 +379,14 @@ export class AumDataService {
         } else if (item.platform?.toLowerCase().includes('black diamond')) {
           summary.auaBD += marketValue;
         }
-      }
-
-      // Allocate to platforms based on the platform field
-      if (item.platform?.toLowerCase() === 'addepar') {
-        summary.addepar += marketValue;
-      } else if (item.platform?.toLowerCase().includes('black diamond')) {
-        summary.blackdiamond += marketValue;
+      } else {
+        // Allocate to platforms based on the platform field (Normal AUM)
+        summary.aum += marketValue;
+        if (item.platform?.toLowerCase() === 'addepar') {
+          summary.addepar += marketValue;
+        } else if (item.platform?.toLowerCase().includes('black diamond')) {
+          summary.blackdiamond += marketValue;
+        }
       }
     });
 
@@ -396,6 +400,7 @@ export class AumDataService {
           aua: summary.aua,
           auaAddepar: summary.auaAddepar,
           auaBD: summary.auaBD,
+          aum: summary.aum,
           addepar: summary.addepar,
           blackdiamond: summary.blackdiamond
         });
@@ -657,7 +662,7 @@ export class AumDataService {
     // 1. Prepare "Report" sheet (Dashboard data)
     const reportData = [];
     // Header
-    reportData.push(["Advisor", "Data Provider", "Addepar", "Black Diamond", "AUA Addepar", "AUA Black Diamond", "AUA Total", "Grand Total"]);
+    reportData.push(["Advisor", "Data Provider", "Addepar", "Black Diamond", "AUM Total", "AUA Addepar", "AUA Black Diamond", "AUA Total", "Grand Total"]);
 
     // Rows
     const dashRows = this.filteredRows();
@@ -667,6 +672,7 @@ export class AumDataService {
         row.provider,
         row.addepar,
         row.blackdiamond,
+        row.aum,
         row.auaAddepar,
         row.auaBD,
         row.aua,
@@ -677,7 +683,7 @@ export class AumDataService {
     // Grand Total
     const totals = this.kpi();
     reportData.push([]); // Empty line
-    reportData.push(["Grand Total", "", totals.grandAddepar, totals.grandBD, totals.grandAuaAddepar, totals.grandAuaBD, totals.grandAua, totals.grandTotal]);
+    reportData.push(["Grand Total", "", totals.grandAddepar, totals.grandBD, totals.grandAum, totals.grandAuaAddepar, totals.grandAuaBD, totals.grandAua, totals.grandTotal]);
 
     // 2. Prepare "Data" sheet
     const dataTabContent = [];

@@ -6,6 +6,7 @@ import com.aumReport.aum.entity.Vendor;
 import com.aumReport.aum.enums.AdvisorType;
 import com.aumReport.aum.enums.VendorType;
 import com.aumReport.aum.repo.AccountRepository;
+import com.aumReport.aum.repo.CustodianRepository;
 import com.aumReport.aum.service.AccountService;
 import com.aumReport.aum.service.AdvisorService;
 import com.aumReport.aum.service.AumService;
@@ -40,6 +41,8 @@ public class AumServiceImpl implements AumService {
     AccountDataHelper accountDataHelper;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private CustodianRepository custodianRepository;
 
     @Override
     public List<DataResponse> getData() {
@@ -197,18 +200,33 @@ public class AumServiceImpl implements AumService {
                 
                 // If account number is exactly 8 digits -> Schwab
                 if (accountNumber != null && accountNumber.matches("^\\d{8}$")) {
-                    // Find Schwab custodian by name
-                    // Note: You'll need to implement getCustodianByName in your service
-//                     account.setCustodianId(getCustodianIdByName("Schwab"));
+                    Optional<com.aumReport.aum.entity.Custodian> schwabCustodian = custodianRepository.findByNameIgnoreCase("Schwab");
+                    if (schwabCustodian.isPresent()) {
+                        account.setCustodianId(schwabCustodian.get().getId());
+                    } else {
+                        // Create new Schwab custodian if not found
+                        com.aumReport.aum.entity.Custodian newCustodian = new com.aumReport.aum.entity.Custodian();
+                        newCustodian.setName("Schwab");
+                        newCustodian.setCreatedTimestamp(java.time.LocalDateTime.now());
+                        newCustodian.setUpdatedTimestamp(java.time.LocalDateTime.now());
+                        com.aumReport.aum.entity.Custodian savedCustodian = custodianRepository.save(newCustodian);
+                        account.setCustodianId(savedCustodian.getId());
+                    }
                 }
                 // If account number is 9 characters with 3 alphabets + 6 numbers -> Pershing
-                else if (accountNumber != null && accountNumber.matches("^[a-zA-Z]{3}\\d{6}$")) {
-                    // Find Pershing custodian by name
-                    // account.setCustodianId(getCustodianIdByName("Pershing"));
-                }
-                // Default case: set to "-" custodian
-                else {
-                    // account.setCustodianId(getCustodianIdByName("-"));
+                if (accountNumber != null && accountNumber.matches("^[a-zA-Z]{3}\\d{6}$")) {
+                    Optional<com.aumReport.aum.entity.Custodian> pershingCustodian = custodianRepository.findByNameIgnoreCase("Pershing");
+                    if (pershingCustodian.isPresent()) {
+                        account.setCustodianId(pershingCustodian.get().getId());
+                    } else {
+                        // Create new Pershing custodian if not found
+                        com.aumReport.aum.entity.Custodian newCustodian = new com.aumReport.aum.entity.Custodian();
+                        newCustodian.setName("Pershing");
+                        newCustodian.setCreatedTimestamp(java.time.LocalDateTime.now());
+                        newCustodian.setUpdatedTimestamp(java.time.LocalDateTime.now());
+                        com.aumReport.aum.entity.Custodian savedCustodian = custodianRepository.save(newCustodian);
+                        account.setCustodianId(savedCustodian.getId());
+                    }
                 }
             }
         }

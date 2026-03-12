@@ -6,7 +6,8 @@
     "start": "ng serve --optimization=true",
     "build": "ng build --optimization=true",
     "watch": "ng build --watch --configuration development --optimization=true",
-    "test": "ng test"
+    "test": "ng test",
+    "poc": "ng build --configuration production --base-href /aum_report/"
   },
   "prettier": {
     "printWidth": 100,

@@ -19,4 +19,8 @@ public interface FileUploadService {
 
     void bdAdvisorUpdate(MultipartFile file) throws IOException;
 
+    void blackDiamondUploadV2(MultipartFile file) throws IOException;
+
+    void addeparUploadV2(MultipartFile file) throws IOException;
+
 }

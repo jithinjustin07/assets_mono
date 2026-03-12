@@ -18,6 +18,13 @@ export class DataTable {
 
   onToggle(advisor: string): void { this.svc.toggleAdvisor(advisor); }
 
+  get aumColspan(): number {
+    let count = 1; // AUM Total always shown
+    if (this.svc.platformDisplay().addepar) count++;
+    if (this.svc.platformDisplay().blackdiamond) count++;
+    return count;
+  }
+
   get auaColspan(): number {
     let count = 1; // AUA Total always shown
     if (this.svc.platformDisplay().addepar) count++;

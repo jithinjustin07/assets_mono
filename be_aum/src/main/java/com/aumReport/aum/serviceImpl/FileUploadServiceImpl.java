@@ -1,17 +1,23 @@
 package com.aumReport.aum.serviceImpl;
 
 import com.aumReport.aum.entity.Account;
+import com.aumReport.aum.entity.AddeparAccount;
+import com.aumReport.aum.entity.BlackDiamondAccount;
 import com.aumReport.aum.entity.Custodian;
 import com.aumReport.aum.entity.Holding;
 import com.aumReport.aum.entity.Relationship;
 import com.aumReport.aum.entity.Vendor;
 import com.aumReport.aum.enums.VendorType;
 import com.aumReport.aum.repo.AccountRepository;
+import com.aumReport.aum.repo.AddeparAccountRepository;
+import com.aumReport.aum.repo.BlackDiamondAccountRepository;
 import com.aumReport.aum.repo.CustodianRepository;
 import com.aumReport.aum.repo.HoldingRepository;
 import com.aumReport.aum.repo.RelationshipRepository;
 import com.aumReport.aum.repo.VendorRepository;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -23,6 +29,8 @@ import com.aumReport.aum.service.FileUploadService;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -30,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @Service
 public class FileUploadServiceImpl implements FileUploadService {
@@ -48,6 +57,12 @@ public class FileUploadServiceImpl implements FileUploadService {
 
     @Autowired
     VendorRepository vendorRepository;
+
+    @Autowired
+    private BlackDiamondAccountRepository blackDiamondAccountRepository;
+
+    @Autowired
+    private AddeparAccountRepository addeparAccountRepository;
 
     // Helper method to safely get string value from cell
     private String getCellStringValue(Row row, int cellIndex) {
@@ -675,5 +690,220 @@ public class FileUploadServiceImpl implements FileUploadService {
 
         workbook.close();
     }
+
+        @Override
+        @Transactional
+        public void blackDiamondUploadV2(MultipartFile file) throws IOException {
+            Workbook workbook = new XSSFWorkbook(file.getInputStream());
+            Sheet sheet = workbook.getSheetAt(0);
+
+            List<BlackDiamondAccount> batch = new ArrayList<>();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+
+            for (Row row : sheet) {
+
+                if (row.getRowNum() == 0) {
+                    continue; // skip header
+                }
+
+                BlackDiamondAccount entity = new BlackDiamondAccount();
+
+                entity.setAccountIsOpen(parseBoolean(getCellValue(row.getCell(0))));
+                entity.setRelationshipId(getCellValue(row.getCell(1)));
+                entity.setRelationshipName(getCellValue(row.getCell(2)));
+
+                entity.setPortfolioId(getCellValue(row.getCell(3)));
+                entity.setPortfolioName(getCellValue(row.getCell(4)));
+
+                entity.setAccountId(getCellValue(row.getCell(5)));
+                entity.setAccountNumber(getCellValue(row.getCell(6)));
+                entity.setAccountName(getCellValue(row.getCell(7)));
+
+                entity.setCustodian(getCellValue(row.getCell(8)));
+                entity.setGoal(getCellValue(row.getCell(9)));
+
+                entity.setAum(getCellValue(row.getCell(10)));
+
+                entity.setTaxStatus(getCellValue(row.getCell(11)));
+                entity.setAccountReportingTarget(getCellValue(row.getCell(12)));
+                entity.setAccountBenchmark(getCellValue(row.getCell(13)));
+
+                entity.setAssetId(parseLong(getCellValue(row.getCell(14))));
+                entity.setAssetName(getCellValue(row.getCell(15)));
+
+                entity.setClassName(getCellValue(row.getCell(16)));
+
+                entity.setMarketValue(new BigDecimal(getCellValue(row.getCell(17))));
+
+                entity.setAsOfDate(LocalDate.parse(getCellValue(row.getCell(18)), formatter));
+
+                entity.setAdvisor(getCellValue(row.getCell(20)));
+
+                entity.setIsSupervised(toSupervisedBoolean(getCellValue(row.getCell(19))));
+
+
+
+                batch.add(entity);
+            }
+
+            blackDiamondAccountRepository.saveAll(batch);
+
+            workbook.close();
+        }
+
+        Boolean toSupervisedBoolean(String value) {
+            if (value == null || value.isBlank()) return null;
+            return value.equalsIgnoreCase("Supervised") || value.equalsIgnoreCase("Unsupervised");
+        }
+
+        @Override
+        @Transactional
+        public void addeparUploadV2(MultipartFile file) throws IOException {
+
+            Workbook workbook = new XSSFWorkbook(file.getInputStream());
+            Sheet sheet = workbook.getSheetAt(0);
+
+            List<AddeparAccount> batch = new ArrayList<>();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM d, yyyy");
+
+            for (Row row : sheet) {
+
+                if (row.getRowNum() < 3) {
+                    continue; // skip first 3 rows
+                }
+
+                if (row.getRowNum() == 3) {
+                    continue; // skip header row
+                }
+
+                AddeparAccount entity = new AddeparAccount();
+
+                entity.setHoldingAccount(getCellValue(row.getCell(0)));
+
+                entity.setEntityId(parseLong(getCellValue(row.getCell(1))));
+
+                entity.setModelType(getCellValue(row.getCell(2)));
+
+                entity.setDirectOwnerId(parseLong(getCellValue(row.getCell(3))));
+
+                entity.setTopLevelOwnerId(parseLong(getCellValue(row.getCell(4))));
+
+                entity.setTopLevelOwner(getCellValue(row.getCell(5)));
+
+                entity.setAcAccountNumber(getCellValue(row.getCell(6)));
+
+                entity.setAcGoal(getCellValue(row.getCell(7)));
+
+                entity.setAcCustodian(getCellValue(row.getCell(8)));
+
+                entity.setAcAvestar(parseBoolean(getCellValue(row.getCell(9))));
+
+                entity.setAcAum(parseBoolean(getCellValue(row.getCell(10))));
+
+                entity.setAcReportingTarget(getCellValue(row.getCell(11)));
+
+                entity.setAcAssetClass(getCellValue(row.getCell(12)));
+
+                entity.setAcSubAssetClass(getCellValue(row.getCell(13)));
+
+                entity.setAdjustedValueUsd(parseCurrency(getCellValue(row.getCell(14))));
+
+                entity.setAcLastActivityDate(parseDate(row.getCell(15), formatter));
+                entity.setIsSupervised(toSupervisedBoolean(getCellValue(row.getCell(16))));
+
+                batch.add(entity);
+            }
+
+            addeparAccountRepository.saveAll(batch);
+
+            workbook.close();
+        }
+
+
+    private String getCellValue(Cell cell) {
+
+        if (cell == null) return "";
+
+        switch (cell.getCellType()) {
+
+            case STRING:
+                return cell.getStringCellValue();
+
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+
+            default:
+                return "";
+        }
+    }
+
+    private Long parseLong(String value) {
+
+        if (value == null || value.isEmpty()) return null;
+
+        return (long) Double.parseDouble(value);
+    }
+
+    private Boolean parseBoolean(String value) {
+
+        if (value == null) return false;
+
+        return value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("true");
+    }
+
+    private BigDecimal parseCurrency(String value) {
+
+        if (value == null || value.isEmpty()) return BigDecimal.ZERO;
+
+        if(value.equalsIgnoreCase("-")){
+            return BigDecimal.ZERO;
+        }
+
+        value = value.replace("$", "").replace(",", "");
+
+        return new BigDecimal(value);
+    }
+
+    private LocalDate parseDate(Cell cell, DateTimeFormatter formatter) {
+
+        if (cell == null) return null;
+
+        if (cell.getCellType() == CellType.STRING) {
+            String value = cell.getStringCellValue();
+            if (value == null || value.isEmpty() || value.equalsIgnoreCase("-")) {
+                return null;
+            }
+            return LocalDate.parse(value, formatter);
+        }
+
+        if (cell.getCellType() == CellType.NUMERIC) {
+
+            if (DateUtil.isCellDateFormatted(cell)) {
+                return cell.getLocalDateTimeCellValue().toLocalDate();
+            }
+
+            // Excel serial date case
+            double excelDate = cell.getNumericCellValue();
+            return DateUtil.getLocalDateTime(excelDate).toLocalDate();
+        }
+
+        if (cell.getCellType() == CellType.STRING) {
+
+            String value = cell.getStringCellValue();
+
+            if (value == null || value.isEmpty()) return null;
+
+            return LocalDate.parse(value, formatter);
+        }
+
+        return null;
+    }
+
+
 
 }

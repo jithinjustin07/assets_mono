@@ -4,6 +4,7 @@ export interface AumRow {
   aua: number;
   auaAddepar: number;
   auaBD: number;
+  aum: number;
   addepar: number;
   blackdiamond: number;
   total?: number;
@@ -33,6 +34,7 @@ export interface KpiData {
   grandAua: number;
   grandAuaAddepar: number;
   grandAuaBD: number;
+  grandAum: number;
   grandAddepar: number;
   grandBD: number;
   grandTotal: number;
@@ -45,6 +47,7 @@ export interface AdvisorGroup {
   totalAua: number;
   totalAuaAddepar: number;
   totalAuaBD: number;
+  totalAum: number;
   totalAddepar: number;
   totalBD: number;
   grandTotal: number;
