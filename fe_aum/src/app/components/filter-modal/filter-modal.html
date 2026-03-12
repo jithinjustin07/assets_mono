@@ -30,6 +30,13 @@
         <!-- Multiselect -->
         @if (f.type === 'multiselect') {
         <div class="ms-list">
+          @if (hasSelectAll(f.key)) {
+          <label class="ms-item" [class.selected]="isAllSelected(f.key)">
+            <input type="checkbox" [checked]="isAllSelected(f.key)"
+              (change)="toggleSelectAll(f.key, $any($event.target).checked)" />
+            All
+          </label>
+          }
           @for (opt of f.options; track opt) {
           <label class="ms-item" [class.selected]="getSet(f.key).has(opt)">
             <input type="checkbox" [checked]="getSet(f.key).has(opt)"

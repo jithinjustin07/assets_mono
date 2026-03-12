@@ -83,7 +83,48 @@ export class FilterModal implements AfterViewInit, OnDestroy {
     return (this.svc.activeDraft()[key] as string) ?? '';
   }
 
+  // Keys that should have a "Select All" checkbox at the top
+  private selectAllKeys = new Set(['advisor', 'provider', 'platformView', 'Data Provider', 'Advisor', 'Platform']);
+
+  hasSelectAll(key: string): boolean {
+    return this.selectAllKeys.has(key);
+  }
+
+  isAllSelected(key: string): boolean {
+    const config = this.svc.activeFilterConfig().find(f => f.key === key);
+    if (!config?.options?.length) return false;
+    const current = this.getSet(key);
+    return config.options.every(opt => current.has(opt));
+  }
+
+  toggleSelectAll(key: string, checked: boolean): void {
+    const config = this.svc.activeFilterConfig().find(f => f.key === key);
+    if (!config?.options) return;
+    if (checked) {
+      this.svc.updateDraftValue(key, new Set(config.options));
+    } else {
+      this.svc.updateDraftValue(key, new Set());
+    }
+  }
+
   toggleOption(key: string, opt: string, checked: boolean): void {
+    // AUM filter: exclusive radio-like behavior
+    if (key === 'aumFilter') {
+      if (!checked) {
+        // Don't allow unchecking the only selected option; default to All
+        this.svc.updateDraftValue(key, new Set(['All']));
+        return;
+      }
+      if (opt === 'All') {
+        // "All" deselects Yes/No
+        this.svc.updateDraftValue(key, new Set(['All']));
+      } else {
+        // "Yes" or "No" deselects All and the other
+        this.svc.updateDraftValue(key, new Set([opt]));
+      }
+      return;
+    }
+
     const current = new Set(this.getSet(key));
     if (checked) current.add(opt); else current.delete(opt);
     this.svc.updateDraftValue(key, current);

@@ -93,7 +93,10 @@ export class AumDataService {
     return config.filter(f => {
       if (!f.matchable) return false;
       const v = filters[f.key];
-      if (v instanceof Set) return v.size > 0;
+      if (v instanceof Set) {
+        if (f.key === 'aumFilter' && v.size === 1 && v.has('All')) return false;
+        return v.size > 0;
+      }
       if (v && typeof v === 'object') return (v as RangeValue).min !== '' || (v as RangeValue).max !== '';
       return v !== '' && v !== (f.defaultValue as string);
     }).length;
@@ -170,6 +173,7 @@ export class AumDataService {
         if (!f.matchable) continue;
 
         if (f.key === 'platformView') continue; // Handled via visibility, not filtering rows
+        if (f.key === 'aumFilter') continue; // Handled via backend API call, not client-side filtering
 
         if (f.type === 'multiselect') {
           const set = filters[f.key] as Set<string>;
@@ -272,9 +276,14 @@ export class AumDataService {
   private loadBackendData(): void {
     // Get AUM filter state to determine API call
     const aumFilter = this.filters()['aumFilter'] as Set<string>;
+    const isReload = this.dashboardData() !== null;
+    // Capture current filter/draft state before the HTTP call so we can restore it
+    const savedFilters = isReload ? this.cloneState(this.filters()) : null;
+    const savedDraft = isReload ? this.cloneState(this.draft()) : null;
+
     let url = `${environment.api.baseUrl}/api/aum/data`;
 
-    if (aumFilter && aumFilter.size > 0) {
+    if (aumFilter && aumFilter.size > 0 && !aumFilter.has('All')) {
       if (aumFilter.has('Yes')) {
         url += '?aum=true';
       } else if (aumFilter.has('No')) {
@@ -292,8 +301,14 @@ export class AumDataService {
 
       // Initialize Dashboard Filters
       const dashDefaults = this.buildDefaults(dashboardData.filterConfig);
-      this.filters.set(dashDefaults);
-      this.draft.set(this.cloneState(dashDefaults));
+      if (isReload && savedFilters) {
+        // Preserve user's current selections; only refresh filter config options
+        this.filters.set(savedFilters);
+        this.draft.set(savedDraft!);
+      } else {
+        this.filters.set(dashDefaults);
+        this.draft.set(this.cloneState(dashDefaults));
+      }
 
       // Initialize Data Filters
       const dataDefaults = this.buildDefaults(this.dataFilterConfig());
@@ -305,14 +320,14 @@ export class AumDataService {
   }
 
   private loadCustodians(): void {
-     const url = `${environment.api.baseUrl}/api/custodians`;
+    const url = `${environment.api.baseUrl}/api/custodians`;
     this.http.get<Custodian[]>(url).subscribe(data => {
       this.custodians.set(data);
     });
   }
 
   private loadAdvisors(): void {
-     const url = `${environment.api.baseUrl}/api/advisors`;
+    const url = `${environment.api.baseUrl}/api/advisors`;
     this.http.get<Advisor[]>(url).subscribe(data => {
       this.advisors.set(data);
     });
@@ -434,8 +449,8 @@ export class AumDataService {
           label: "AUM",
           type: "multiselect",
           icon: "check_circle",
-          options: ["Yes", "No"],
-          defaultValue: [],
+          options: ["All", "Yes", "No"],
+          defaultValue: ["All"],
           matchable: true
         }
       ],
