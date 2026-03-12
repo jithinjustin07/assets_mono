@@ -27,6 +27,7 @@ export class DataTable {
 
   get rowsInfo(): string {
     if (this.svc.loading()) return 'Loading...';
+    if (this.svc.error()) return 'Data unavailable. Please refresh.';
     const groups = this.svc.advisorGroups();
     const filtered = this.svc.filteredRows();
     if (!groups.length) return 'No results';

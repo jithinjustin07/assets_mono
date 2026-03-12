@@ -32,7 +32,7 @@ import { AumDataService } from './services/aum-data';
 })
 export class App implements OnInit {
   private authService = inject(AuthService);
-  private svc = inject(AumDataService);
+  protected svc = inject(AumDataService);
   private isDataLoaded = false;
 
   public isAuthenticated = computed(() => this.authService.authState() === 'authenticated');

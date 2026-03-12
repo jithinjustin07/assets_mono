@@ -60,6 +60,7 @@ main.flex-1 {
   /* small clean gap */
   align-items: stretch;
   /* Stretch sidebar height to match table height */
+  margin-top: -15px;
 }
 
 /* Filter sidebar: fixed 260px, never shrinks */

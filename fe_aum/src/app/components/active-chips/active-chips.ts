@@ -39,9 +39,4 @@ export class ActiveChips {
   }
 
   removeChip(key: string): void { this.svc.removeFilter(key); }
-
-  protected onSearch(event: Event): void {
-    const q = (event.target as HTMLInputElement).value;
-    this.svc.setSearch(q);
-  }
 }

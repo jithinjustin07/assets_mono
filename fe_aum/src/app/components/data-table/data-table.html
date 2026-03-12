@@ -66,6 +66,15 @@
             </div>
           </td>
         </tr>
+        } @else if (svc.error()) {
+        <tr>
+          <td colspan="8" class="px-6 py-12 text-center text-sm text-red-500 font-medium">
+            <div class="flex flex-col items-center gap-2">
+              <span class="material-icons text-4xl text-red-400">error_outline</span>
+              <span>Failed to load data. Please refresh the page.</span>
+            </div>
+          </td>
+        </tr>
         } @else if (svc.advisorGroups().length === 0) {
         <tr>
           <td colspan="8" class="px-6 py-12 text-center text-sm text-slate-400 italic">
@@ -238,6 +247,16 @@
             <div class="loading-container">
               <div class="loading-spinner"></div>
               <p class="loading-text">Loading data...</p>
+            </div>
+          </td>
+        </tr>
+        } @else if (svc.error()) {
+        <tr>
+          <td [attr.colspan]="svc.visibleDataColumns().size"
+            class="px-6 py-12 text-center text-sm text-red-500 font-medium">
+            <div class="flex flex-col items-center gap-2">
+              <span class="material-icons text-4xl text-red-400">error_outline</span>
+              <span>Failed to load data. Please refresh the page.</span>
             </div>
           </td>
         </tr>

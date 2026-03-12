@@ -23,6 +23,7 @@ export class AumDataService {
   readonly custodians = signal<Custodian[]>([]);
   readonly advisors = signal<Advisor[]>([]);
   readonly loading = signal<boolean>(true);
+  readonly error = signal<boolean>(false);
 
   // ── Filter & sort state ─────────────────────────────────────────────────
   readonly sortCol = signal<string | null>(null);
@@ -298,30 +299,38 @@ export class AumDataService {
     }
 
     this.loading.set(true);
-    this.http.get<BackendDataResponse[]>(url).subscribe(data => {
-      this.backendData.set(data);
+    this.error.set(false); // Reset error state before new call
+    this.http.get<BackendDataResponse[]>(url).subscribe({
+      next: (data) => {
+        this.backendData.set(data);
 
-      // Transform backend data to dashboard format
-      const dashboardData = this.transformToDashboardData(data);
-      this.dashboardData.set(dashboardData);
+        // Transform backend data to dashboard format
+        const dashboardData = this.transformToDashboardData(data);
+        this.dashboardData.set(dashboardData);
 
-      // Initialize Dashboard Filters
-      const dashDefaults = this.buildDefaults(dashboardData.filterConfig);
-      if (isReload && savedFilters) {
-        // Preserve user's current selections; only refresh filter config options
-        this.filters.set(savedFilters);
-        this.draft.set(savedDraft!);
-      } else {
-        this.filters.set(dashDefaults);
-        this.draft.set(this.cloneState(dashDefaults));
+        // Initialize Dashboard Filters
+        const dashDefaults = this.buildDefaults(dashboardData.filterConfig);
+        if (isReload && savedFilters) {
+          // Preserve user's current selections; only refresh filter config options
+          this.filters.set(savedFilters);
+          this.draft.set(savedDraft!);
+        } else {
+          this.filters.set(dashDefaults);
+          this.draft.set(this.cloneState(dashDefaults));
+        }
+
+        // Initialize Data Filters
+        const dataDefaults = this.buildDefaults(this.dataFilterConfig());
+        this.dataFilters.set(dataDefaults);
+        this.dataDraft.set(this.cloneState(dataDefaults));
+
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load AUM data', err);
+        this.error.set(true);
+        this.loading.set(false);
       }
-
-      // Initialize Data Filters
-      const dataDefaults = this.buildDefaults(this.dataFilterConfig());
-      this.dataFilters.set(dataDefaults);
-      this.dataDraft.set(this.cloneState(dataDefaults));
-
-      this.loading.set(false);
     });
   }
 

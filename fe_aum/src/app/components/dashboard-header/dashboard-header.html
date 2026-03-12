@@ -1,6 +1,11 @@
 <div class="text-center mb-2 pb-4">
   <div>
     <h2 class="text-2xl font-serif font-semibold text-[#0a1947]">Assets Under Management Report</h2>
+    @if (svc.dashboardData()) {
+      <!-- <div class="mt-1 text-sm text-slate-500 font-medium">
+        {{ svc.dashboardData()!.asOfLabel }}
+      </div> -->
+    }
   </div>
 
   <div class="mt-4 flex items-center justify-between w-full mx-auto px-4 relative">

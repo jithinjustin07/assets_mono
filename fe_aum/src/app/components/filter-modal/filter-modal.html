@@ -15,6 +15,7 @@
     <!-- Body: single column list of filters -->
     <div class="filter-body custom-scrollbar">
       @for (f of svc.activeFilterConfig(); track f.key) {
+      @if (f.key !== 'reportDate') {
       <div class="filter-group" [attr.data-key]="f.key">
 
         <div class="filter-label-row">
@@ -70,6 +71,7 @@
         }
 
       </div>
+      }
       }
     </div>
 

@@ -78,6 +78,13 @@ public class AumServiceImpl implements AumService {
                 response.setAdvisor("Avestar");
                 response.setDataProvider("FOS");
             }
+            if(response.getDataProvider().equalsIgnoreCase("External Investment")){
+                response.setDataProvider("External Alternative");
+            }
+            if(response.getDataProvider().equalsIgnoreCase("Internal Investment")){
+                response.setDataProvider("Internal Alternative");
+            }
+
             if(response.getAccountName().contains("MAHADEVIA")){
                 response.setAum(true);
                 response.setAua(null);

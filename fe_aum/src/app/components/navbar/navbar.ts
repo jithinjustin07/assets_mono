@@ -9,8 +9,4 @@ import { AumDataService } from '../../services/aum-data';
 })
 export class Navbar {
   protected svc = inject(AumDataService);
-
-  onSearch(e: Event): void {
-    this.svc.setSearch((e.target as HTMLInputElement).value);
-  }
 }
