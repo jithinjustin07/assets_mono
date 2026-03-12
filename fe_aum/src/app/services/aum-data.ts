@@ -224,6 +224,8 @@ export class AumDataService {
       advisor,
       rows: grpRows,
       totalAua: grpRows.reduce((s, r) => s + r.aua, 0),
+      totalAuaAddepar: grpRows.reduce((s, r) => s + r.auaAddepar, 0),
+      totalAuaBD: grpRows.reduce((s, r) => s + r.auaBD, 0),
       totalAddepar: grpRows.reduce((s, r) => s + r.addepar, 0),
       totalBD: grpRows.reduce((s, r) => s + r.blackdiamond, 0),
       grandTotal: grpRows.reduce((s, r) => s + (r.total ?? 0), 0),
@@ -251,10 +253,14 @@ export class AumDataService {
   readonly kpi = computed<KpiData>(() => {
     const groups = this.advisorGroups();
     const grandAua = groups.reduce((s, g) => s + g.totalAua, 0);
+    const grandAuaAddepar = groups.reduce((s, g) => s + g.totalAuaAddepar, 0);
+    const grandAuaBD = groups.reduce((s, g) => s + g.totalAuaBD, 0);
     const grandAddepar = groups.reduce((s, g) => s + g.totalAddepar, 0);
     const grandBD = groups.reduce((s, g) => s + g.totalBD, 0);
     return {
       grandAua,
+      grandAuaAddepar,
+      grandAuaBD,
       grandAddepar,
       grandBD,
       grandTotal: grandAddepar + grandBD,
@@ -335,7 +341,7 @@ export class AumDataService {
 
   private transformToDashboardData(data: BackendDataResponse[]): AumDashboardData {
     // Group data by advisor and data provider to calculate summary rows
-    const groupedData = new Map<string, Map<string, { aua: number; addepar: number; blackdiamond: number }>>();
+    const groupedData = new Map<string, Map<string, { aua: number; auaAddepar: number; auaBD: number; addepar: number; blackdiamond: number }>>();
 
     data.forEach(item => {
       const advisor = item.advisor;
@@ -348,13 +354,19 @@ export class AumDataService {
 
       const advisorMap = groupedData.get(advisor)!;
       if (!advisorMap.has(provider)) {
-        advisorMap.set(provider, { aua: 0, addepar: 0, blackdiamond: 0 });
+        advisorMap.set(provider, { aua: 0, auaAddepar: 0, auaBD: 0, addepar: 0, blackdiamond: 0 });
       }
 
       const summary = advisorMap.get(provider)!;
       // Calculate AUA from market value when aua is true
       if (item.aua) {
         summary.aua += marketValue;
+        // Break down AUA by platform
+        if (item.platform?.toLowerCase() === 'addepar') {
+          summary.auaAddepar += marketValue;
+        } else if (item.platform?.toLowerCase().includes('black diamond')) {
+          summary.auaBD += marketValue;
+        }
       }
 
       // Allocate to platforms based on the platform field
@@ -373,6 +385,8 @@ export class AumDataService {
           advisor,
           provider,
           aua: summary.aua,
+          auaAddepar: summary.auaAddepar,
+          auaBD: summary.auaBD,
           addepar: summary.addepar,
           blackdiamond: summary.blackdiamond
         });
@@ -401,6 +415,7 @@ export class AumDataService {
           span: "full",
           matchable: false
         },
+        /*
         {
           key: "advisor",
           label: "Advisor",
@@ -444,6 +459,7 @@ export class AumDataService {
           defaultValue: [],
           matchable: true
         },
+        */
         {
           key: "aumFilter",
           label: "AUM",
@@ -632,7 +648,7 @@ export class AumDataService {
     // 1. Prepare "Report" sheet (Dashboard data)
     const reportData = [];
     // Header
-    reportData.push(["Advisor", "Data Provider", "AUA", "Addepar", "Black Diamond", "Total"]);
+    reportData.push(["Advisor", "Data Provider", "Addepar", "Black Diamond", "AUA Addepar", "AUA Black Diamond", "AUA Total", "Grand Total"]);
 
     // Rows
     const dashRows = this.filteredRows();
@@ -640,9 +656,11 @@ export class AumDataService {
       reportData.push([
         row.advisor,
         row.provider,
-        row.aua,
         row.addepar,
         row.blackdiamond,
+        row.auaAddepar,
+        row.auaBD,
+        row.aua,
         row.total || 0
       ]);
     });
@@ -650,7 +668,7 @@ export class AumDataService {
     // Grand Total
     const totals = this.kpi();
     reportData.push([]); // Empty line
-    reportData.push(["Grand Total", "", totals.grandAua, totals.grandAddepar, totals.grandBD, totals.grandTotal]);
+    reportData.push(["Grand Total", "", totals.grandAddepar, totals.grandBD, totals.grandAuaAddepar, totals.grandAuaBD, totals.grandAua, totals.grandTotal]);
 
     // 2. Prepare "Data" sheet
     const dataTabContent = [];

@@ -2,6 +2,8 @@ export interface AumRow {
   advisor: string;
   provider: string;
   aua: number;
+  auaAddepar: number;
+  auaBD: number;
   addepar: number;
   blackdiamond: number;
   total?: number;
@@ -29,6 +31,8 @@ export interface FilterState {
 
 export interface KpiData {
   grandAua: number;
+  grandAuaAddepar: number;
+  grandAuaBD: number;
   grandAddepar: number;
   grandBD: number;
   grandTotal: number;
@@ -39,6 +43,8 @@ export interface AdvisorGroup {
   advisor: string;
   rows: AumRow[];
   totalAua: number;
+  totalAuaAddepar: number;
+  totalAuaBD: number;
   totalAddepar: number;
   totalBD: number;
   grandTotal: number;

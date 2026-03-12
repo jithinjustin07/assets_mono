@@ -528,13 +528,13 @@ public class FileUploadServiceImpl implements FileUploadService {
                     // Update custodian ID based on alternative investment type
                     if(account.getAlternativeInvestmentType().contains("Internal")) {
                         // Search for "Internal Investment" custodian
-                        Optional<Custodian> internalCustodian = custodianRepository.findByNameIgnoreCase("Internal Investment");
+                        Optional<Custodian> internalCustodian = custodianRepository.findByNameIgnoreCase("Internal Alternative");
                         if (internalCustodian.isPresent()) {
                             account.setCustodianId(internalCustodian.get().getId());
                         } else {
                             // Create "Internal Investment" custodian if not found
                             Custodian newCustodian = new Custodian();
-                            newCustodian.setName("Internal Investment");
+                            newCustodian.setName("Internal Alternative");
                             newCustodian.setCreatedTimestamp(LocalDateTime.now());
                             newCustodian.setUpdatedTimestamp(LocalDateTime.now());
                             Custodian savedCustodian = custodianRepository.save(newCustodian);
@@ -542,13 +542,13 @@ public class FileUploadServiceImpl implements FileUploadService {
                         }
                     } if(account.getAlternativeInvestmentType().contains("External")) {
                         // Search for "External Investment" custodian
-                        Optional<Custodian> externalCustodian = custodianRepository.findByNameIgnoreCase("External Investment");
+                        Optional<Custodian> externalCustodian = custodianRepository.findByNameIgnoreCase("External Alternative");
                         if (externalCustodian.isPresent()) {
                             account.setCustodianId(externalCustodian.get().getId());
                         } else {
                             // Create "External Investment" custodian if not found
                             Custodian newCustodian = new Custodian();
-                            newCustodian.setName("External Investment");
+                            newCustodian.setName("External Alternative");
                             newCustodian.setCreatedTimestamp(LocalDateTime.now());
                             newCustodian.setUpdatedTimestamp(LocalDateTime.now());
                             Custodian savedCustodian = custodianRepository.save(newCustodian);

@@ -8,17 +8,17 @@
     <div class="flex flex-none justify-center">
       <div #tabSwitcher class="tab-switcher flex py-3 text-sm font-medium relative">
 
-        <button #dashboardTab type="button" (click)="onTabClick('summary')"
+        <!-- <button #dashboardTab type="button" (click)="onTabClick('summary')"
           [ngClass]="svc.viewMode() === 'summary' ? 'tab-btn tab-btn-active' : 'tab-btn'"
           class="bg-transparent focus:outline-none">
           <span class="tab-text">Report</span>
-        </button>
+        </button> -->
 
-        <button #dataTab type="button" (click)="onTabClick('data')"
+        <!-- <button #dataTab type="button" (click)="onTabClick('data')"
           [ngClass]="svc.viewMode() === 'data' ? 'tab-btn tab-btn-active' : 'tab-btn'"
           class="bg-transparent focus:outline-none">
           <span class="tab-text">Data</span>
-        </button>
+        </button> -->
 
         <div #tabIndicator class="tab-indicator"></div>
 
@@ -72,6 +72,6 @@
     </div>
 
     <!-- <input type="text" placeholder="Search " -->
-      <!-- class="w-[200.637px] pl-10 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003366] transition-all" /> -->
+    <!-- class="w-[200.637px] pl-10 pr-4 py-2 bg-slate-100 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#003366] transition-all" /> -->
   </div>
 </div>

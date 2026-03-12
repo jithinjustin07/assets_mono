@@ -4,42 +4,54 @@
     <table class="divide-y divide-slate-200">
       <thead class="bg-[rgba(0,0,0,1)] text-white">
         <tr>
-          <th (click)="onSort('advisor')"
-            class="px-6 py-1 text-left text-xs font-bold uppercase tracking-wider w-1/4 cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+          <th rowspan="2" (click)="onSort('advisor')"
+            class="px-6 py-1 text-left text-xs font-bold uppercase tracking-wider w-1/6 cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none align-bottom">
             Advisor <span class="sort-icon-text">{{ sortIcon('advisor') }}</span>
           </th>
-          <th (click)="onSort('provider')"
-            class="px-6 py-1 text-left text-xs font-bold uppercase tracking-wider w-1/4 cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+          <th rowspan="2" (click)="onSort('provider')"
+            class="px-6 py-1 text-left text-xs font-bold uppercase tracking-wider w-1/6 cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none align-bottom">
             Data Provider <span class="sort-icon-text">{{ sortIcon('provider') }}</span>
           </th>
-          <th (click)="onSort('aua')"
-            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
-            <div class="flex flex-col items-end">
-              <span>AUA <span class="sort-icon-text">{{ sortIcon('aua') }}</span></span>
-            </div>
-          </th>
           @if (svc.platformDisplay().addepar) {
-          <th (click)="onSort('addepar')"
-            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
-            <div class="flex flex-col items-end">
-              <span>Addepar <span class="sort-icon-text">{{ sortIcon('addepar') }}</span></span>
-            </div>
+          <th rowspan="2" (click)="onSort('addepar')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none align-bottom">
+            Addepar <span class="sort-icon-text">{{ sortIcon('addepar') }}</span>
           </th>
           }
           @if (svc.platformDisplay().blackdiamond) {
-          <th (click)="onSort('blackdiamond')"
-            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
-            <div class="flex flex-col items-end">
-              <span>Black Diamond <span class="sort-icon-text">{{ sortIcon('blackdiamond') }}</span></span>
-            </div>
+          <th rowspan="2" (click)="onSort('blackdiamond')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none align-bottom">
+            Black Diamond <span class="sort-icon-text">{{ sortIcon('blackdiamond') }}</span>
           </th>
           }
-          <th (click)="onSort('total')"
-            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider bg-[rgba(0,0,0,1)] cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+          <th [attr.colspan]="auaColspan"
+            class="px-6 py-1 text-center text-xs font-bold uppercase tracking-wider border-l border-slate-600">
+            <span class="text-[rgba(197,160,89,1)]">AUA</span>
+          </th>
+          <th rowspan="2" (click)="onSort('total')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none align-bottom border-l border-slate-600">
             <div class="flex flex-col items-end">
               <span class="text-[rgba(197,160,89,1)] text-[10px]">Total</span>
               <span>Grand Total <span class="sort-icon-text">{{ sortIcon('total') }}</span></span>
             </div>
+          </th>
+        </tr>
+        <tr>
+          @if (svc.platformDisplay().addepar) {
+          <th (click)="onSort('auaAddepar')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none border-l border-slate-600">
+            Addepar <span class="sort-icon-text">{{ sortIcon('auaAddepar') }}</span>
+          </th>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <th (click)="onSort('auaBD')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+            Black Diamond <span class="sort-icon-text">{{ sortIcon('auaBD') }}</span>
+          </th>
+          }
+          <th (click)="onSort('aua')"
+            class="px-6 py-1 text-right text-xs font-bold uppercase tracking-wider cursor-pointer hover:bg-[rgba(0,0,0,1)] select-none">
+            AUA Total <span class="sort-icon-text">{{ sortIcon('aua') }}</span>
           </th>
         </tr>
       </thead>
@@ -47,7 +59,7 @@
 
         @if (svc.loading()) {
         <tr>
-          <td colspan="5" class="px-6 py-12 text-center">
+          <td colspan="8" class="px-6 py-12 text-center">
             <div class="loading-container">
               <div class="loading-spinner"></div>
               <p class="loading-text">Loading data...</p>
@@ -56,7 +68,7 @@
         </tr>
         } @else if (svc.advisorGroups().length === 0) {
         <tr>
-          <td colspan="5" class="px-6 py-12 text-center text-sm text-slate-400 italic">
+          <td colspan="8" class="px-6 py-12 text-center text-sm text-slate-400 italic">
             No results match your filters.
           </td>
         </tr>
@@ -73,14 +85,21 @@
           </td>
           <td class="px-6 py-1 text-sm text-slate-400 italic">{{ group.rows.length }} provider{{ group.rows.length > 1 ?
             's' : '' }} (collapsed)</td>
-          <td class="px-6 py-1 text-sm text-right text-black">{{ svc.fmt(group.totalAua) }}</td>
           @if (svc.platformDisplay().addepar) {
           <td class="px-6 py-1 text-sm text-right text-black">{{ svc.fmt(group.totalAddepar) }}</td>
           }
           @if (svc.platformDisplay().blackdiamond) {
           <td class="px-6 py-1 text-sm text-right text-black">{{ svc.fmt(group.totalBD) }}</td>
           }
-          <td class="px-6 py-1 text-sm font-medium text-black text-right bg-slate-50">{{
+          @if (svc.platformDisplay().addepar) {
+          <td class="px-6 py-1 text-sm text-right text-black border-l border-slate-200">{{
+            svc.fmt(group.totalAuaAddepar) }}</td>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <td class="px-6 py-1 text-sm text-right text-black">{{ svc.fmt(group.totalAuaBD) }}</td>
+          }
+          <td class="px-6 py-1 text-sm text-right text-black">{{ svc.fmt(group.totalAua) }}</td>
+          <td class="px-6 py-1 text-sm font-medium text-black text-right bg-slate-50 border-l border-slate-200">{{
             svc.fmt(group.grandTotal) }}</td>
         </tr>
         } @else {
@@ -91,28 +110,37 @@
             (click)="onToggle(group.advisor)">
             <span class="material-icons text-[#C5A059] text-lg">expand_more</span>{{ group.advisor }}
           </td>
-          <td colspan="5"></td>
+          <td colspan="7"></td>
         </tr>
         <!-- Detail rows -->
         @for (row of group.rows; track row.provider) {
         <tr class="group">
           <td class="px-6 py-1 text-sm text-slate-500 pl-12 border-r border-slate-100 bg-white"></td>
           <td class="px-6 py-1 text-sm text-slate-600 font-medium">
-            <!-- Clickable provider chip -->
-            <button type="button" (click)="svc.navigateToProvider(group.advisor, row.provider)"
+            <!-- Clickable provider chip (DISABLED: User requested to comment out data tab navigation) -->
+            <!-- <button type="button" (click)="svc.navigateToProvider(group.advisor, row.provider)"
               class="bg-transparent text-slate-600 font-medium hover:underline cursor-pointer focus:outline-none"
               title="View all accounts for {{ row.provider }} under {{ group.advisor }}">
               {{ row.provider }}
-            </button>
+            </button> -->
+            <span class="text-slate-600 font-medium">{{ row.provider }}</span>
           </td>
-          <td class="px-6 py-1 text-sm text-black text-right">{{ svc.fmt(row.aua) }}</td>
           @if (svc.platformDisplay().addepar) {
           <td class="px-6 py-1 text-sm text-black text-right">{{ svc.fmt(row.addepar) }}</td>
           }
           @if (svc.platformDisplay().blackdiamond) {
           <td class="px-6 py-1 text-sm text-black text-right">{{ svc.fmt(row.blackdiamond) }}</td>
           }
-          <td class="px-6 py-1 text-sm font-medium text-black text-right bg-slate-50">{{ svc.fmt(row.total
+          @if (svc.platformDisplay().addepar) {
+          <td class="px-6 py-1 text-sm text-black text-right border-l border-slate-100">{{ svc.fmt(row.auaAddepar) }}
+          </td>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <td class="px-6 py-1 text-sm text-black text-right">{{ svc.fmt(row.auaBD) }}</td>
+          }
+          <td class="px-6 py-1 text-sm text-black text-right">{{ svc.fmt(row.aua) }}</td>
+          <td class="px-6 py-1 text-sm font-medium text-black text-right bg-slate-50 border-l border-slate-100">{{
+            svc.fmt(row.total
             ?? 0) }}</td>
         </tr>
         }
@@ -121,15 +149,21 @@
         <tr class="bg-slate-100 border-t border-slate-300">
           <td class="px-6 py-3 text-sm font-bold text-[#003366] pl-8 font-serif">{{ group.advisor }} Total</td>
           <td></td>
-          <td class="px-6 py-1 text-sm font-bold text-black text-right">{{ svc.fmt(group.totalAua) }}</td>
           @if (svc.platformDisplay().addepar) {
-          <td class="px-6 py-1 text-sm font-bold text-black text-right">{{ svc.fmt(group.totalAddepar) }}
-          </td>
+          <td class="px-6 py-1 text-sm font-bold text-black text-right">{{ svc.fmt(group.totalAddepar) }}</td>
           }
           @if (svc.platformDisplay().blackdiamond) {
           <td class="px-6 py-1 text-sm font-bold text-black text-right">{{ svc.fmt(group.totalBD) }}</td>
           }
-          <td class="px-6 py-1 text-sm font-bold text-black text-right bg-slate-200">{{
+          @if (svc.platformDisplay().addepar) {
+          <td class="px-6 py-1 text-sm font-bold text-black text-right border-l border-slate-200">{{
+            svc.fmt(group.totalAuaAddepar) }}</td>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <td class="px-6 py-1 text-sm font-bold text-black text-right">{{ svc.fmt(group.totalAuaBD) }}</td>
+          }
+          <td class="px-6 py-1 text-sm font-bold text-black text-right">{{ svc.fmt(group.totalAua) }}</td>
+          <td class="px-6 py-1 text-sm font-bold text-black text-right bg-slate-200 border-l border-slate-200">{{
             svc.fmt(group.grandTotal) }}</td>
         </tr>
         }
@@ -141,16 +175,20 @@
         <tr class="bg-white border-t-4 border-[#003366]">
           <td class="px-6 py-1 text-lg font-bold text-[#003366] font-serif">Grand Total</td>
           <td class="px-6 py-1"></td>
-          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandAua) }}
-          </td>
           @if (svc.platformDisplay().addepar) {
-          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandAddepar)
-            }}</td>
+          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandAddepar) }}</td>
           }
           @if (svc.platformDisplay().blackdiamond) {
-          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandBD) }}
-          </td>
+          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandBD) }}</td>
           }
+          @if (svc.platformDisplay().addepar) {
+          <td class="px-6 py-1 text-lg font-bold text-black text-right border-l border-slate-200">{{
+            svc.fmt(svc.kpi().grandAuaAddepar) }}</td>
+          }
+          @if (svc.platformDisplay().blackdiamond) {
+          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandAuaBD) }}</td>
+          }
+          <td class="px-6 py-1 text-lg font-bold text-black text-right">{{ svc.fmt(svc.kpi().grandAua) }}</td>
           <td class="px-6 py-1 text-lg font-bold text-black text-right bg-slate-100 border-l border-slate-200">{{
             svc.fmt(svc.kpi().grandTotal) }}</td>
         </tr>

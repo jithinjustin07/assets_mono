@@ -81,7 +81,7 @@ public class AumServiceImpl implements AumService {
             if(response.getAccountName().contains("MAHADEVIA")){
                 response.setAum(true);
                 response.setAua(null);
-                response.setDataProvider("External Investment");
+                response.setDataProvider("External Alternative");
             }
             if(response.getDataProvider().equalsIgnoreCase("Alternative Investment") ){
                 response.setDataProvider("manual");
