@@ -2,9 +2,9 @@
   <div>
     <h2 class="text-2xl font-serif font-semibold text-[#0a1947]">Assets Under Management Report</h2>
     @if (svc.dashboardData()) {
-      <!-- <div class="mt-1 text-sm text-slate-500 font-medium">
+       <div class="mt-1 text-sm text-slate-500 font-medium">
         {{ svc.dashboardData()!.asOfLabel }}
-      </div> -->
+      </div>
     }
   </div>
 
@@ -13,17 +13,17 @@
     <div class="flex flex-none justify-center">
       <div #tabSwitcher class="tab-switcher flex py-3 text-sm font-medium relative">
 
-        <!-- <button #dashboardTab type="button" (click)="onTabClick('summary')"
+         <button #dashboardTab type="button" (click)="onTabClick('summary')"
           [ngClass]="svc.viewMode() === 'summary' ? 'tab-btn tab-btn-active' : 'tab-btn'"
           class="bg-transparent focus:outline-none">
           <span class="tab-text">Report</span>
-        </button> -->
+        </button>
 
-        <!-- <button #dataTab type="button" (click)="onTabClick('data')"
+         <button #dataTab type="button" (click)="onTabClick('data')"
           [ngClass]="svc.viewMode() === 'data' ? 'tab-btn tab-btn-active' : 'tab-btn'"
           class="bg-transparent focus:outline-none">
           <span class="tab-text">Data</span>
-        </button> -->
+        </button>
 
         <div #tabIndicator class="tab-indicator"></div>
 

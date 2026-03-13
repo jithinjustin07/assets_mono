@@ -76,13 +76,7 @@ export class AumDataService {
   readonly filterConfig = computed<FilterConfig[]>(() => this.dashboardData()?.filterConfig ?? []);
 
   // ── Data Tab Specific Config ─────────────────────────────────────────────
-  readonly dataFilterConfig = computed<FilterConfig[]>(() => [
-    { key: 'Data Provider', label: 'Data Provider', type: 'multiselect', icon: 'hub', options: this.getCustodianNames(), defaultValue: [], matchable: true },
-    { key: 'Advisor', label: 'Advisor', type: 'multiselect', icon: 'person', options: this.getAdvisorNames(), defaultValue: [], matchable: true },
-    { key: 'Account Supervised', label: 'Account Supervised', type: 'multiselect', icon: 'security', options: this.getUnique('Account Supervised'), defaultValue: [], matchable: true },
-    { key: 'AUM', label: 'AUM', type: 'multiselect', icon: 'check_circle', options: this.getUnique('AUM'), defaultValue: [], matchable: true },
-    { key: 'Platform', label: 'Platform', type: 'multiselect', icon: 'layers', options: this.getUnique('Platform'), defaultValue: [], matchable: true }
-  ]);
+  readonly dataFilterConfig = computed<FilterConfig[]>(() => []);
 
   // ── View-Aware Accessors ─────────────────────────────────────────────────
   readonly activeFilterConfig = computed(() => this.viewMode() === 'summary' ? this.filterConfig() : this.dataFilterConfig());
@@ -322,6 +316,7 @@ export class AumDataService {
           this.draft.set(this.cloneState(dashDefaults));
         }
 
+        // Initialize Data Filters
         // Initialize Data Filters
         const dataDefaults = this.buildDefaults(this.dataFilterConfig());
         this.dataFilters.set(dataDefaults);

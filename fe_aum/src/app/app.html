@@ -13,9 +13,11 @@
 
       <div class="content-row flex w-full">
         <!-- Aside at extreme left with 1px left margin from viewport -->
+        @if (svc.viewMode() !== 'data') {
         <aside class="filter-aside">
           <app-filter-modal></app-filter-modal>
         </aside>
+        }
 
         <!-- Table/content section takes remaining width -->
         <section class="flex-1">

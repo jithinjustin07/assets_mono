@@ -56,7 +56,8 @@ public class AumServiceImpl implements AumService {
         dataResponses.addAll(getAddeparData());
         dataResponses.removeIf(account ->
                 account.accountNumber == null || account.accountNumber.trim().isEmpty() ||
-                        account.accountName == null ||  account.accountName.trim().isEmpty()
+                        account.accountName == null ||  account.accountName.trim().isEmpty() || (account.getMarketValue()==0 && account.getAccountNumber().equalsIgnoreCase("VMI-WP2"))
+                ||  (account.getMarketValue()==0 && account.getAccountNumber().equalsIgnoreCase("VMFGT-WP1"))
         );
 
         // Filter by AUM status if parameter is provided
@@ -86,8 +87,9 @@ public class AumServiceImpl implements AumService {
             }
             if(response.getDataProvider().equalsIgnoreCase("Internal Investment")){
                 response.setDataProvider("Internal Alternative");
+            } if(response.getDataProvider().equalsIgnoreCase("Pershing Advisory Solutions")){
+                response.setDataProvider("Pershing");
             }
-
             if(response.getAccountName().contains("MAHADEVIA")){
                 response.setAum(true);
                 response.setAua(null);
@@ -96,6 +98,7 @@ public class AumServiceImpl implements AumService {
             if(response.getDataProvider().equalsIgnoreCase("Alternative Investment") ){
                 response.setDataProvider("manual");
             }
+
         });
         
         return dataResponses;
@@ -380,6 +383,17 @@ public class AumServiceImpl implements AumService {
         return new ArrayList<>();
     }
 
-    
+    List<Account> deleteMeBlack() {
+        Optional<Vendor> blackDiamondVendors = vendorService.getVendorByName(VendorType.Black_Diamond.getValue());
+        if (blackDiamondVendors.isPresent()) {
+            Long blackDiamondVendorId = (long) blackDiamondVendors.get().getId();
+            List<Account> filteredAccounts = new ArrayList<>();
 
+            // Fetch accounts for the Addepar vendor
+            filteredAccounts.addAll(accountService.getDistinctAccountsByVendorId(blackDiamondVendorId));
+            return filteredAccounts;
+        }
+      return null;
+
+    }
 }
